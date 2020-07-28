@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="shortcut icon" href="images/favicon.png"
+	type="image/fav.icon" />
+<link
+	href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i"
+	rel="stylesheet"></link>
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<title>Quality Management System</title>
+
+<!-- Bootstrap -->
+<link href="/css/bootstrap.min.css" rel="stylesheet"></link>
+<link href="/css/style.css" rel="stylesheet"></link>
+<link rel="stylesheet" href="/css/font-awesome.min.css"></link>
+<link rel="stylesheet" href="/css/layout.css" />
+<script src="/js/common.js"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>  -->
+	 <script src="/js/jquery.min.js"></script>
+
+
+
+<script th:inline="javascript" type="text/javascript">
+    /*<![CDATA[*/
+    $(document).ready(function() {
+    	
+        $("#folder").change(function() {
+            sendAjaxRequest();
+        });
+        
+        $("#subfolderlevel0").change(function() {
+            sendAjaxRequestLevelFirst();
+        }); 
+        
+        $("#subfolderLevel1").change(function() {
+            sendAjaxRequestLevelSecond();
+        });  
+        $("#subfolderLevel2").change(function() {
+            sendAjaxRequestLevelThird();
+        });
+        
+    });
+	function userManagmentAction() {
+		window.location.href = "/searchuser"
+	}
+	function folderAction() {
+		window.location.href = "/createfolder"
+	}
+	
+	var glValDet;
+	var glFolDet;
+	var glValUserId;
+	var glValModuleId;
+	
+	function createFolder() {
+		// Get the modal
+		var modal = document.getElementById('myModal');
+		modal.style.display = "block";
+		var element  = document.getElementById("valuedet");
+		glValDet = element;
+		element.parentNode.removeChild(element);
+		document.getElementById("folderdet").style.visibility = "visible";
+	}
+	
+	function createFolderNew() {
+		var modal = document.getElementById('myModalFourLevel');
+		modal.style.display = "block";
+		var element  = document.getElementById("valuedet");
+		glValDet = element;
+		element.parentNode.removeChild(element);
+		document.getElementById("folderdet").style.visibility = "visible";
+		
+	}
+	
+	
+	function editFolder(parentId,folderName,moduleId,userId) {
+		// Get the modal ,subFolder
+		var requestData={};
+		glValModuleId = moduleId;
+		requestData["userId"]=userId;
+		requestData["glValModuleId"]=glValModuleId;
+		$.ajax({
+			  type: "post",
+			  url: "/getDetailsforModule",
+			  cache: false,    
+			  data:requestData,
+			  dataType : 'json',
+			  
+			  success: function(response){
+				  var modal = document.getElementById('myModal1');
+					modal.style.display = "block";
+					var element  = document.getElementById("folderName");
+					element.value=parentId;
+					var subFolder  = document.getElementById("subFolderName");
+					subFolder.value=folderName;
+					data=response.length;
+		 		      	var checkVal=$("input:checkbox[name=downloadAuthorized]").val;
+							checkVal=response[0].flag;
+							if(checkVal==true)
+								//$("input:checkbox[name=downloadAuthorized]").attr("checked",true);
+								$('#downloadAuthorized').prop('checked',true);
+							else
+								//$("input:checkbox[name=downloadAuthorized]").attr("checked",false);
+							    $('#downloadAuthorized').prop('checked',false);
+		 		      
+		      data=response.length;
+		      
+			  },
+			  error: function(){      
+			   alert('Error while request..');
+			  }
+			 });
+
+/* 		var modal = document.getElementById('myModal1');
+		modal.style.display = "block";
+		var element  = document.getElementById("folderName");
+		element.value=parentId;
+		var subFolder  = document.getElementById("subFolderName");
+		subFolder.value=folderName;
+ */		
+	}
+	function updateDetails(userId){
+		var flag;
+		if(($("input:checkbox[name=downloadAuthorized]")).prop("checked") == true){
+            flag=true;
+        }
+        else {
+            flag=false;
+        }
+		window.location.href = "/updateFolderDetails/"+flag+"/"+userId+"/"+glValModuleId;
+		
+	}
+	function closeClass(){
+		var modal = document.getElementById('myModal');
+		var span = document.getElementsByClassName("close")[0];
+		modal.style.display = "none";
+	}
+	function closeClass1(){
+		var modal = document.getElementById('myModal1');
+		var span = document.getElementsByClassName("close")[0];
+		modal.style.display = "none";
+	}
+	
+	function closeClassNew(){
+		
+		var modal = document.getElementById('myModalFourLevel');
+		var span = document.getElementsByClassName("close")[0];
+		modal.style.display = "none";
+	}
+	
+	
+	function checkFunction(cb){
+		if(!cb.checked){
+			var element  = document.getElementById("details");
+			element.parentNode.append(glValDet);
+			//document.getElementById("valuedet").style.visibility = "visible";
+			var element1  = document.getElementById("folderdet");
+			glFolDet = element1;
+			element1.parentNode.removeChild(element1);
+			//document.getElementById("folderdet").style.visibility = "hidden";
+		}else{
+			var element  = document.getElementById("valuedet");
+			glValDet = element;
+			element.parentNode.removeChild(element);
+			//document.getElementById("valuedet").style.visibility = "hidden";
+			var element1  = document.getElementById("details");
+			element1.parentNode.append(glFolDet);
+			//document.getElementById("folderdet").style.visibility = "visible";
+		}
+	}
+	
+	function sendAjaxRequest() {
+	    var requestData ={};
+	    var data;
+	    requestData["country"]=jQuery.trim($('#folder').val());
+	    $.ajax({
+ 			  type: "post",
+ 			  url: "/subfolder",
+ 			  cache: false,    
+ 			  data:requestData,
+ 			  dataType : 'json',
+ 			  success: function(response){
+ 				 $("#subfolder").empty();
+ 			 data=response.length;
+ 		      for(i=0;i<response.length;i++){
+ 		    	 var option = "<option value = " + response[i].errorCode + ">" +response[i].errorMessage  +  "</option>";
+		            $("#subfolder").append(option);
+ 		      }
+ 			  },
+ 			  error: function(){      
+ 			   alert('Error while request..');
+ 			  }
+ 			 });
+	}
+	
+	function sendAjaxRequestLevelFirst(){
+		 var requestData ={};
+		    var data;
+		    requestData["country"]=jQuery.trim($('#subfolderlevel0').val());
+		    $.ajax({
+	 			  type: "post",
+	 			  url: "/subfolder",
+	 			  cache: false,    
+	 			  data:requestData,
+	 			  dataType : 'json',
+	 			  success: function(response){
+	 				$("#subfolderLevel1").empty();
+	 				$("#subfolderLevel2").empty();
+	 				$("#subfolderLevel3").empty();
+	 				
+	 				$("#subfolderLevel1").append("<option value = '-1'>" + "Select" +  "</option>");
+	 			 	data=response.length;
+	 		      	for(i=0;i<response.length;i++){
+	 		    		var option = "<option value = " + response[i].errorCode + ">" +response[i].errorMessage  +  "</option>";
+	 		    		$("#subfolderLevel1").append(option);
+	 		      	}
+	 			  },
+	 			  error: function(){      
+	 			   alert('Error while request..');
+	 			  }
+	 		});
+	}
+	
+	function sendAjaxRequestLevelSecond(){
+		 var requestData ={};
+		    var data;
+		    requestData["country"]=jQuery.trim($('#subfolderLevel1').val());
+		    $.ajax({
+	 			  type: "post",
+	 			  url: "/subfolder",
+	 			  cache: false,    
+	 			  data:requestData,
+	 			  dataType : 'json',
+	 			  success: function(response){
+	 				$("#subfolderLevel2").empty();
+	 				$("#subfolderLevel3").empty();
+	 				
+	 			 	data=response.length;
+	 			 	$("#subfolderLevel2").append("<option value = '-1'>" + "Select" +  "</option>");
+	 		      	for(i=0;i<response.length;i++){
+	 		      		var option = "<option value = " + response[i].errorCode + ">" +response[i].errorMessage  +  "</option>";
+	 		      		$("#subfolderLevel2").append(option);
+	 		      	}
+	 			  },
+	 			  error: function(){      
+	 			   alert('Error while request..');
+	 			  }
+	 		});
+	}
+	
+	function sendAjaxRequestLevelThird(){
+		 var requestData ={};
+		    var data;
+		    requestData["country"]=jQuery.trim($('#subfolderLevel2').val());
+		    $.ajax({
+	 			  type: "post",
+	 			  url: "/subfolder",
+	 			  cache: false,    
+	 			  data:requestData,
+	 			  dataType : 'json',
+	 			  success: function(response){
+	 				$("#subfolderLevel3").empty();
+	 				
+	 			 	data=response.length;
+	 			 	$("#subfolderLevel3").append("<option value = '-1'>" + "Select" +  "</option>");
+	 		      	for(i=0;i<response.length;i++){
+	 		      		
+	 		      		var option = "<option value = " + response[i].errorCode + ">" +response[i].errorMessage  +  "</option>";
+	 		      		$("#subfolderLevel3").append(option);
+	 		      	}
+	 			  },
+	 			  error: function(){      
+	 			   alert('Error while request..');
+	 			  }
+	 		});
+	}
+	
+	
+	function noBack() {
+		window.history.forward();
+	}
+	function logout() {
+		window.location.href = "/logout"
+	}
+	
+	function redirectHome() {
+		window.location.href = "/redirecthome"
+	}
+	function revokeAccess(userId){
+		var folderId = [];
+		glValUserId = userId;
+		if ($('#check:checked').length > 0) {
+			$('#revoke-button').css("display", "block");
+
+		} else {
+			$('#revoke-button').css("display", "none");
+		}
+		
+		var seletedRadioButtonId = $("input[name=revokeId]:checked").val();
+			folderId.push(seletedRadioButtonId);
+			console.log(seletedRadioButtonId);
+	
+
+		/* $("input:radio[name=revokeId]:checked").each(function() {
+			folderId.push($(this).val());
+			console.log(folderId);
+		}); */
+	}
+	
+	function revokeButton(){
+		var revokeValues = [];
+		var seletedRadioButtonId = $("input[name=revokeId]:checked").val();
+		revokeValues.push(seletedRadioButtonId);
+		console.log(revokeValues);
+		/* $("input:checkbox[name=revokeId]:checked").each(function() {
+			revokeValues.push($(this).val());
+		}); */
+		
+		window.location.href = "/revokeFolderAccess/" + glValUserId +"/" + revokeValues;
+	}
+	
+	function backToHomeScreen() {	
+		window.location.href = "/searchuser";
+	}
+	
+
+/*]]>*/
+</script>
+</head>
+<body onload="noBack();" onpageshow="if (event.persisted) noBack();">
+	<!--HEADER START-->
+	
+	
+	
+	
+	<div class="header">
+		<div class="header_inner">
+			<div class="inner_logo">
+				<img src="/images/inner_logo.png" alt="Quality Management System"
+					onclick="redirectHome()" title="Quality Management System" />
+			</div>
+			<div class="header_right">
+				<span STYLE="color: white; font-size: 10pt"> User:</span> 
+				
+				<span
+					STYLE="color: white; font-size: 10pt"
+					th:text="${session.SESSION_USER_VO.firstName + ' ' +session.SESSION_USER_VO.lastName}"
+					th:if="${session.SESSION_USER_VO != null}">
+				</span>
+				
+				<input type="text" class="header_search" placeholder="Search files" name="search" hidden="true" />
+				
+				<button class="common_btn width100" onclick="userManagmentAction()">
+					<img src="/images/group_user_icon.png" class="icon_mr"
+						alt="User management" title="User management" />User management
+				</button>
+				
+				<button class="common_btn width100" onclick="logout()">
+					<img src="/images/logout_icon.png" class="icon_mr" alt="logout"
+						title="logout" />Logout
+				</button>
+			</div>
+
+		</div>
+	</div>
+	<!--HEADER END-->
+	 <div class="watermark">
+		<img src="/images/watermark_4.png" />
+	</div> 
+	<!--CONTAINER START-->
+	
+	
+	
+	<div class="container">
+	
+	<div class="inner_heading_title">
+			<h1>
+				<span><img src="/images/back_arrow_icon.png"  alt="Back" title="Back" onclick="backToHomeScreen()" /></span>
+			</h1>
+	</div>
+	
+	<h1 class="flashMessage" th:text="${message}"></h1><br/>
+	
+		<span th:each="errorMessageVO : ${errorMsg}"><span
+			class="usererror" th:text="${errorMessageVO.errorMessage}"
+			th:if="${errorMessageVO.errorMessage != null}"></span></span>
+		<table id="employeesTable">
+
+			<!-- Header Table -->
+
+			<thead>
+				<tr>
+					<th style="text-align: center;width:150px">Revoke Action</th>
+					<th style="text-align: center;width:350px">Parent Folder</th>
+					<th style="text-align: center;width:350px">Child  Folder</th>
+					<th style="text-align: center;width:150px">Manage Download</th>
+				</tr>
+			</thead>
+			<!-- Footer Table -->
+			<tbody>
+				<tr th:each="user: ${moduleDetail}">
+					<td style="text-align: center;"><input type="radio" name="revokeId" id="check" th:value="${user.mstModule.moduleId}" th:onchange="|revokeAccess('${userId}')|"/></td>
+					<td th:text="${user.mstModule.parentId}" value="" />
+					<td th:text="${user.mstModule.moduleName}" id="moduleName"/>
+					<td th:if="${user.mstModule.moduleName != null}" style="text-align: center;">
+						<a href="#" th:onclick="|editFolder('${user.mstModule.parentId}','${user.mstModule.moduleName}','${user.mstModule.moduleId}','${userId}')|">Edit</a>
+					</td>
+					<td th:if="${user.mstModule.moduleName == null}"></td>
+
+				</tr>
+			</tbody>
+		</table>
+		<div class="locationdir" th:text="${dirloc}" hidden="true"></div>
+		<div class="inner_btn_wrapper">
+			<!-- <button class="common_btn" value="New" onclick="createFolder()" >
+				<img src="/images/add_user_icon.png" class="icon_mr"
+					alt="Add Folder" title="Add Folder" />Folder Authorization
+			</button>
+			 -->
+			
+			<button class="common_btn" value="New" onclick="createFolderNew()" >
+				<img src="/images/add_user_icon.png" class="icon_mr"
+					alt="Add Folder" title="Add Folder" />Folder Authorization
+			</button>
+			
+		</div>
+		<!-- Added by Ajay for prepare pop-up model -->
+		<!-- The Modal -->
+		<div id="myModal" class="modal">
+
+			<!-- Modal content -->
+			<div class="modal-content">
+				<form id="modelform" action="#" th:action="@{/saveUserAccess}"
+					th:object="${userAccess}" method="post">
+					<span class="close" onclick="closeClass()">&times;</span> <input
+						type="hidden" th:field="*{userId}" id="userName" />
+					<div class="row" id="folderdet">
+						<div class="col-25">Folder</div>
+						<div class="col-75">
+							<select class="select_arrow" th:field="*{mstModule.moduleId}"
+								id="folder" required="required">
+								<option value="-1">select</option>
+								<option th:each="cat : ${folderDetail}"
+									th:value="${cat.moduleId}" th:text="${cat.moduleName}"></option>
+							</select>
+						</div>
+					</div>
+					<div class="row" id="folderdet">
+						<div class="col-25">Sub Folder</div>
+						<div class="col-75">
+							<select class="select_arrow" th:field="*{createdBy}"
+								id="subfolder" required="required">
+
+							</select>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-25"></div>
+						<div class="inner_btn_wrapper">
+							<button class="common_btn" value="New" type="submit">Authorized</button>
+						</div>
+					</div>
+				</form>
+
+			</div>
+		</div>
+		
+		<!-- Start : Added By Harshil For 4 level Authorization -->
+		<div id="myModalFourLevel" class="modal">
+			<!-- Modal content -->
+			<div class="modal-content">
+				<form id="modelform" action="#" th:action="@{/saveUserAccessNew}"
+					th:object="${userAccess}" method="post">
+					<span class="close" onclick="closeClassNew()">&times;</span> <input
+						type="hidden" th:field="*{userId}" id="userName" />
+					<div class="row" id="folderdet">
+						<div class="col-25">Folder</div>
+						<div class="col-75">
+							<select class="select_arrow" th:field="*{mstModule.moduleId}"
+								id="subfolderlevel0" required="required">
+								<option value="-1">select</option>
+								<option th:each="cat : ${folderDetail}"
+									th:value="${cat.moduleId}" th:text="${cat.moduleName}"></option>
+							</select>
+						</div>
+					</div>
+					<div class="row" id="folderdet">
+						<div class="col-25">Sub Folder1</div>
+						<div class="col-75">
+						
+							<select class="select_arrow" th:field="*{createdBy}" id="subfolderLevel1" required="required">
+							<!-- <option value="-1" >Select</option> -->
+							</select>
+						</div>
+					</div>
+					<div class="row" id="folderdet">
+						<div class="col-25">Sub Folder2</div>
+						<div class="col-75">
+							<select class="select_arrow" th:field="*{createdBy}" id="subfolderLevel2">
+							<!--  <option value="" >Select</option> -->
+							</select>
+						</div>
+					</div>
+					<div class="row" id="folderdet">
+						<div class="col-25">Sub Folder3</div>
+						<div class="col-75">
+							<select class="select_arrow" th:field="*{createdBy}" id="subfolderLevel3">
+							<!-- <option value="" >Select</option> -->				
+							</select>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-25"></div>
+						<div class="inner_btn_wrapper">
+							<button class="common_btn" value="New" type="submit">Authorized</button>
+						</div>
+					</div>
+				</form>
+
+			</div>
+		</div>
+		<!-- End : Added By Harshil For 4 level Authorization -->
+		
+		<!-- added by vrinda to edit document-->
+		<div id="myModal1" class="modal">
+
+			<!-- Modal content -->
+			<div class="modal-content">
+				 <!-- <form id="modelform1" th:action="@{/updateFolderDetails/${downloadAuthorized}/${userId}/${glValModuleId}}" 
+					 method="post"> -->
+					<span class="close" onclick="closeClass1()">&times;</span> <input
+						type="hidden" th:field="*{userId}" id="userName" />
+					<div class="row" id="folderdet1">
+						<div class="col-25">Folder</div>
+						<div class="col-75">
+							<input type="text" id="folderName" name="folderName" readonly="readonly"/>
+						</div>
+					</div>
+					<div class="row" id="folderdet1">
+						<div class="col-25">Sub Folder</div>
+						<div class="col-75">
+							<input type="text" id="subFolderName" readonly="readonly"/>
+						</div>
+					</div>
+					<div class="row" id="folderdet1">
+						<div class="col-25">Download Allowed</div>
+						<div class="col-75">
+							<input type="checkbox" name="downloadAuthorized" id="downloadAuthorized"/>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-25"></div>
+						<div class="inner_btn_wrapper">
+							<button class="common_btn" value="New" type="submit" th:onclick="|updateDetails('${userId}')|">Update</button>
+						</div>
+					</div>
+				<!-- </form>  -->
+
+			</div>
+		</div>
+		<div class="row">
+			<!--BOX START-->
+			<div class="col-xs-6 col-sm-2 col_category_box"
+				onclick="documentAction()" th:each="folder: ${folderNames}">
+				<div class="category_box2">
+					<img src="images/folder_icon.png" alt="were" />
+					<h1 th:text="${folder}"></h1>
+				</div>
+			</div>
+					
+			<div>
+				<button class="common_btn1" value="New"  title="Revoke Access"  style="display: none;" id="revoke-button" alt="Revoke Access" onclick="revokeButton()">
+					<img src="/images/removeFolder.png" style="height:18px" class="icon_mr"
+					alt="Add Folder" title="Add Folder" />Revoke Access
+				</button>
+			</div>		
+			<!--BOX END-->
+		</div>
+		<!-- </form> -->
+
+	</div>
+
+
+	<!--CONTENT END-->
+
+	<!--FOOTER START-->
+	<div class="footer">Copyright 2019 Future Group. All rights
+		reserved.</div>
+	<!--FOOTER END-->
+
+</body>
+</html>

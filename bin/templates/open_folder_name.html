@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="shortcut icon" href="/images/favicon.png"
+	type="image/fav.icon" />
+<link
+	href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i"
+	rel="stylesheet" />
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<title>Quality Management System</title>
+
+<!-- Bootstrap -->
+<link href="/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/css/style.css" rel="stylesheet" />
+<link href="/css/bootstrap.css" rel="stylesheet" />
+<link rel="stylesheet" href="/css/font-awesome.min.css" />
+
+<style>
+.pagination-centered {
+	text-align: right;
+}
+
+.disabled {
+	pointer-events: none;
+	opacity: 0.5;
+}
+
+.pointer-disabled {
+	pointer-events: none;
+}
+
+#downloadDoc {
+	margin-right: 10px;
+}
+.watermark{
+	 position: fixed; 
+	/* z-index: 0;
+	opacity: 0.2;
+	display: block; */
+	/* margin-top: 0px;
+    margin-left: -11px; */
+    top:70px;
+    left:0;
+     max-height:auto;
+     width:auto; 
+}   
+
+
+
+
+</style>
+<script src="/js/common.js"></script>
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<!-- <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>  -->
+	 <script src="/js/jquery-1.11.0.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="js/bootstrap.min.js"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>  -->
+	 <script src="/js/jquery.min.js"></script>
+
+<script type="text/javascript">
+	function uploadAction() {
+		window.location.href = "/uploadDocument/";
+	}
+
+	function getoldfiles(moduleid) {
+		window.location.href = "/getoldFiles/" + moduleid;
+
+	}
+	
+	function getinactivefiles(moduleid){
+		
+		window.location.href="/getinactiveFiles/"+ moduleid;
+		
+	}
+	
+
+	function openDocument(moduleid) {
+		window.location.href = "/getFolderDetails/" + moduleid;
+	}
+
+	function downloadAction() {
+		window.location.href = "/downloadDocument"
+	}
+
+	$(document).ready(function() {
+		$("#search").keypress(function(e) {
+			if (e.which == 13) {
+				var search = document.getElementById("search").value;
+				if (search === "") {
+					window.location.href = "/searchFile/" + "ALL";
+					return false;
+				} else {
+					window.location.href = "/searchFile/" + search;
+					return false;
+				}
+			}
+		});
+	});
+
+	function userManagmentAction() {
+		window.location.href = "/searchuser"
+	}
+
+	function logout() {
+		window.location.href = "/logout"
+	}
+
+	function redirectHome() {
+		window.location.href = "/redirecthome"
+	}
+
+	function submit(docDetailId) {
+
+		var docId = [];
+		//docId.push(docDetailId);
+		//console.log(docId);
+		//console.log(docDetailId);
+		//alert(docDetailId);
+
+		if ($('#check:checked').length > 0) {
+			$('#inactive-button').css("display", "block");
+
+		} else {
+			$('#inactive-button').css("display", "none");
+		}
+
+		$("input:checkbox[name=active]:checked").each(function() {
+			docId.push($(this).val());
+		});
+
+		console.log(docId);
+
+	}
+
+	function inactive() {
+
+		var inactiveValues = [];
+		$("input:checkbox[name=active]:checked").each(function() {
+			inactiveValues.push($(this).val());
+		});
+
+		window.location.href = "/makeDocumentsinactive/" + inactiveValues;
+
+	}
+	function backToPreviousScreen(parentId) {
+		if (parentId == "#") {
+			window.location.href = "/redirecthome";
+		} else {
+			window.location.href = "/getFolderDetails/" + parentId;
+		}
+	}
+	
+	$(document).ready(function(){
+			
+		$(".selectallitems").click(function(){
+			
+			 if ($(this).is(':checked')) {
+			        $('input[name=active]').prop('checked', true);
+			    } else {
+			        $('input[name=active]').prop('checked', false);
+			    }
+			 
+			 var docId = [];
+				$("input:checkbox[name=active]:checked").each(function() {
+					docId.push($(this).val());
+				});
+					
+				//alert("bindhu"+docId.length);
+				if (($('#selectall:checked').length > 0 )) {
+					if(docId.length>0)
+						$('#inactive-button').css("display", "block");
+
+				} else {
+					$('#inactive-button').css("display", "none");
+				}
+
+				console.log(docId);			
+		});	
+	});	
+	
+</script>
+
+</head>
+<body>
+	<!--HEADER START-->
+	<div class="header">
+
+		<div class="header_inner">
+
+			<div class="inner_logo">
+				<img src="/images/inner_logo.png" alt="Quality Management System"
+					onclick="redirectHome()" title="Quality Management System" />
+			</div>
+
+			<div class="header_right">
+				<span STYLE="color: white; font-size: 10pt"> User:</span> <span
+					STYLE="color: white; font-size: 10pt"
+					th:text="${session.SESSION_USER_VO.firstName + ' ' +session.SESSION_USER_VO.lastName}"
+					th:if="${session.SESSION_USER_VO != null}"> </span> <input
+					type="text" th:if="${filerec}" class="header_search" name="search"
+					id="search" placeholder="Search By file name..." />
+
+				<button
+					th:if="${session.SESSION_USER_VO != null and session.SESSION_USER_VO.role.roleId == 1}"
+					class="common_btn width100" onclick="userManagmentAction()">
+					<img src="/images/group_user_icon.png" class="icon_mr"
+						alt="User management" title="User management" />User management
+				</button>
+				<span class="header_logout">
+					<button class="common_btn width100" th:if="${session.SESSION_USER_VO.role.roleId != 3}" th:onclick="|getoldfiles('${session.MODULE_ID}')|">Document
+						History</button>
+						<button class="common_btn width100" th:if="${session.SESSION_USER_VO.role.roleId != 3}" th:onclick="|getinactivefiles('${session.MODULE_ID}')|">Inactive Files
+						</button>
+					<button class="common_btn width100" onclick="logout()">
+						<img src="/images/logout_icon.png" class="icon_mr" alt="logout"
+							title="logout" />Logout
+					</button>
+
+				</span>
+			</div>
+		</div>
+	</div>
+
+	<p id="text" style="display: none">Checkbox is CHECKED!</p>
+	<!--HEADER END-->
+	<div class="watermark">
+		<img src="/images/watermark_4.png" />
+	</div>
+	<!--CONTAINER START-->
+	<div class="container">
+		<h1 id="locheader" th:text="${location}"></h1>
+		
+		<!--CONTENT START-->
+		<!-- div class="inner_heading_title" th:if="${session.SESSION_USER_VO.roleId != 3}"-->
+		<div class="inner_heading_title">
+			<h1>
+				<span><img src="/images/back_arrow_icon.png" alt="Back"
+					title="Back"
+					th:onclick="|backToPreviousScreen('${session.PARENT_FOLDER_ID}')|" /></span>Open
+				Folder Name
+			</h1>
+			<h1 class ="flashmessage " th:text="${message}"></h1>
+		</div>
+		<!--CONTENT START-->
+		<div class="row" th:if="${childrec == 'enabled'}">
+			<!--BOX START-->
+			
+			<!-- <div class="col-xs-6 col-sm-2 col_category_box folder-left" -->
+			<div class="col-md-3"
+				th:each="childFol: ${childFolList}">
+				<div class="category_box2"
+					th:onclick="|openDocument('${childFol.mstModule.moduleId}')|">
+					<img src="/images/folder_icon.png" alt="were" />
+					<h1 th:text="${childFol.mstModule.moduleName}"></h1>
+					<!-- <a
+						th:text="${childFol.mstModule.moduleName}"
+						th:href="@{'/getFolderDetails/' + ${childFol.mstModule.moduleId}}"></a> -->
+				</div>
+			</div>
+			<!--BOX END-->
+		</div>
+		<!--CONTENT END-->
+		<div th:if="${filerec == 'enabled'}" class="row">
+			<!--BOX START-->
+			<!-- <div class="col-xs-12 col-sm-12 col_for_tab">
+                    	<div class="folder_box">
+                        	<h1 th:text="${doc.fileName}"></h1>
+                        	<div class="folder_box_btn_wrapper">
+                            	<a class="common_btn" data-toggle="modal" th:href="@{'/viewDocument/' + ${doc.fileName}}"><span>View</span></a>
+                            </div>
+                            <div class="folder_box_btn_wrapper" id="downloadDoc">
+                            	<a class="common_btn" data-toggle="modal" th:href="@{'/downloadDocument/' + ${doc.fileName}}"><span>Download</span></a>
+                            </div>
+                        </div>
+                    </div> -->
+                <!--  <span th:text="${session.MODULE_ID}">Hi</span> -->
+			<table id="userTable" class="css-serial">
+				<!-- Header Table -->
+				<thead>
+					<tr>
+
+						<th>Sr. No</th>
+						<th><input type="checkbox" id = "selectall" class="selectallitems"/>Choose</th>
+						<th>Area</th>
+						<th>Category</th>
+						<th>Brand</th>
+						<th>Sub Category</th>
+						<th>Doc Name</th>
+						<th>Doc Number</th>
+						<th>File Name</th>
+						<th>Created By</th>
+						<th>Created On</th>
+						<th>Action</th>
+						<th style="display: none">docDetail</th>
+					</tr>
+				</thead>
+				<!-- Footer Table -->
+				<tbody>
+					 <tr th:each="doc: ${fileDetailList}">
+						<td>&nbsp;</td>
+						<td><input type="checkbox" name="active" id="check"
+							th:onchange="|submit('${doc.docDetailId}')|"
+							th:value="${doc.docDetailId}" /></td>
+						<td th:text="${doc.mstHeader.headerName}"></td>	
+						<td th:text="${doc.categoryName}"></td>
+						<td th:text="${doc.Brand}"></td>
+						<td th:text="${doc.subCategoryName}"></td>
+						<td th:text="${doc.docName}" />
+						<td th:text="${doc.docNumber}" />
+						<td th:text="${doc.fileName}" />
+						<td th:text="${doc.createdBy}" />
+						<!-- <td th:text="${doc.createdOn}" /> -->
+						 <td th:text="${#dates.format(doc.createdOn, 'dd/MM/yyyy')}" /> 
+		 				<td th:if="${flag}">
+						<!-- a data-toggle="modal" th:href="@{'/viewDocument/' + ${doc.fileName} +'/'+${doc.moduleId} }"><span>View</span></a> -->
+						<a data-toggle="modal" th:href="@{'/downloadDocument/' + ${doc.fileName}}"><span>Download</span></a>
+						</td>
+						<td th:unless="${flag}"/>
+						<td th:text="${doc.docDetailId}" style="display: none;" />
+					</tr> 
+
+				</tbody>
+			</table>
+			<!-- <iframe srcdoc="D:\app\DMSQA\Files\TestQA\TESTQA1\455810_2018_4_Payslip.pdf"
+   width="800px" height="600px" > </iframe> -->
+    
+  <!--   <iframe src="http://10.0.35.47/app/DMSQA/Files/TestView/TestView1/blockade.pdf"
+   width="800px" height="600px"  > </iframe>  -->
+   
+    <!-- <iframe srcdoc="http://10.0.35.47/app/DMSQA/Files/TestView/TestView1/blockade.pdf"
+   width="800px" height="600px" > </iframe>   -->
+   
+   
+   <!-- <embed src="file:///D:/app/DMSQA/Files/TestQA/TESTQA1/blockade.pdf" width="800px" height="2100px" /> -->
+   
+   <!-- /app/DMSQA/Files/TestQA/TESTQA1/TESTQA12/TESTQA121 -->
+			
+			<!--BOX END-->
+			
+		</div>
+		<!--PAGINATION START-->
+		<div th:if="${filerec == 'enabled' and navigation == 'enabled'}">
+			<div th:if="${fileDetailList.totalPages != 1}"
+				class="form-group col-md-11 pagination-centered">
+				<ul class="pagination">
+					<li th:class="${fileDetailList.number == 0} ? disabled"><a
+						class="pageLink"
+						th:href="@{/pagination/(pageSize=${selectedPageSize}, page=1, pageName=${pageName}, moduleID=${session.MODULE_ID})}">«</a></li>
+					<li th:class="${fileDetailList.number == 0} ? disabled"><a
+						class="pageLink"
+						th:href="@{/pagination/(pageSize=${selectedPageSize}, page=${fileDetailList.number} ,pageName=${pageName}, moduleID=${session.MODULE_ID})}">←</a>
+					</li>
+					<li
+						th:class="${fileDetailList.number == (page - 1)} ? 'active pointer-disabled'"
+						th:each="page : ${#numbers.sequence(pager.startPage, pager.endPage)}">
+						<a class="pageLink"
+						th:href="@{/pagination/(pageSize=${selectedPageSize}, page=${page}, pageName=${pageName}, moduleID=${session.MODULE_ID})}"
+						th:text="${page}"></a>
+					</li>
+					<li
+						th:class="${fileDetailList.number + 1 == fileDetailList.totalPages} ? disabled">
+						<a class="pageLink"
+						th:href="@{/pagination/(pageSize=${selectedPageSize}, page=${fileDetailList.number + 2}, pageName=${pageName}, moduleID=${session.MODULE_ID})}">→</a>
+					</li>
+					<li
+						th:class="${fileDetailList.number + 1 == fileDetailList.totalPages} ? disabled">
+						<a class="pageLink"
+						th:href="@{/pagination/(pageSize=${selectedPageSize}, page=${fileDetailList.totalPages}, pageName=${pageName},moduleID=${session.MODULE_ID})}">»</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<!--PAGINATION END-->
+		
+		<div id="uplaodbtn"
+			th:if="${session.SESSION_USER_VO.role.roleId != 3 and filerec == 'enabled'}">
+			<span> <br />
+
+
+				<button class="button-blue-desktop mt15" onclick="uploadAction()">
+					<img src="/images/upload_file_icon.png" class="icon_mr"
+						alt="Add User" title="Add User" />Upload File
+				</button>
+
+				<button class="button-blue-desktop1 mt15" id="inactive-button"
+					onclick="inactive()" style="display: none;" alt="Make Inactive"
+					title="Make Inactive">Make Inactive</button>
+
+			</span>
+		</div>
+
+		<!--CONTENT END-->
+	</div>
+
+	<!--CONTAINER END-->
+	<!--FOOTER START-->
+	<div class="footer">Copyright 2019 Future Group. All rights
+		reserved.</div>
+	<!--FOOTER END-->
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		$(document).ready(function() {
+			changePageAndSize();
+		});
+		function changePageAndSize() {
+			$('#pageSizeSelect').change(
+					function(evt) {
+						window.location.replace("/?pageSize=" + this.value
+								+ "&page=1");
+					});
+		}
+		/*]]>*/
+	</script>
+</body>
+</html>

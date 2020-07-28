@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="shortcut icon" href="images/favicon.png"
+	type="image/fav.icon" />
+<link
+	href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i"
+	rel="stylesheet" />
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<title>Quality Management System</title>
+
+<!-- Bootstrap -->
+<link href="/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/css/style.css" rel="stylesheet" />
+<link rel="stylesheet" href="/css/font-awesome.min.css" />
+<link rel="stylesheet" href="/css/layout.css" />
+  <script  src="/js/common.js"></script>
+  <!-- <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>  -->
+  	   <script src="/js/jquery-1.11.0.min.js"></script>
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+<!-- <script type="text/javascript">  -->
+
+<style>
+
+.area{
+		
+		float:left;
+		width:60%;
+		margin-left:300px;
+		margin-bottom:50px; 
+}
+.back{
+		
+		float:left; 
+		width:60%;
+		margin-left:50px;
+		margin-top:-80px; 
+}
+
+
+.required-field::after {
+    content: "*";
+    color: red;
+}
+
+.bag-fields {
+  display: flex;
+   flex-wrap : wrap; 
+   width : 100%;
+}
+
+.bag-field {
+  background-color: white;
+  width: 50%;
+  min-height: 60px;
+  box-sizing: border-box;
+  background-clip:content-box;
+}
+
+.loader-circle {
+    border: 16px solid #f3f3f3; /* Light grey */
+    border-top: 16px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+ 	 margin-left:550px;
+ 	 display: block;
+ 	 float:left;
+	 margin-top:100px;
+    animation: spin 2s linear infinite;
+ }
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+
+</style>
+<script th:inline="javascript" type="text/javascript">
+/*<![CDATA[*/	
+	var globalCat,globalSubCat,globalBrand,globalDocType,globalArtCode,globalProductDetail,globalSupplierCode,globalManufacturerName,globalRegion,globalStatus,globalActive,
+	    globalDistCentCode,globalDistCentName,globalAuditStatus;
+ $(document).ready(function() {
+	 	 
+	 if($("#areaId").val() != 0){
+		
+		// $("#areaId").attr("disabled","true");
+		 var getAreaIdForEdit = $(this).find("option:selected").val();
+		 var setDocDetailIdValue = $("#setDocDetailId").val();
+		 
+	 	sendAjaxRequestForGetAttributeDetails(getAreaIdForEdit);
+	 	
+	 	sendAjaxRequestForEditData(getAreaIdForEdit, setDocDetailIdValue);
+	 }
+	 
+	  OnChangeonLoad();
+	  $("#areaId").change(function() {
+   		var selectedText = $(this).find("option:selected").text();
+    	var selectedValue = $(this).val();
+    	sendAjaxRequestForGetAttributeDetails(selectedValue);
+    }); 
+	$("#loader").hide();
+});
+
+
+ 
+function sendAjaxRequestForEditData(getAreaIdForEdit, docDetailId){
+	
+	if(getAreaIdForEdit != 0){
+		var editData = {};
+		var data;
+		editData["docDetailId"] = docDetailId;
+		editData["getAreaIdForEdit"] = getAreaIdForEdit;
+
+		$.ajax({
+			type: "get",
+			  url: "/editHeaderDetails",
+			  cache: false,    
+			  data:editData,
+			  dataType : 'json',
+			  success: function(response){
+				  debugger;
+				 
+				  data=response.length;
+				  
+				  globalCat  = response.categoryName;
+				  globalSubCat = response.subCategoryName;
+				  globalBrand = response.brand;
+				  globalDocType = response.docType;
+				  
+				  globalArtCode = response.articleCode;
+				  globalProductDetail = response.productDetails;
+				  globalSupplierCode = response.supplierCode;
+				  globalManufacturerName = response.manufacturename;
+				  globalRegion = response.region;
+				  globalStatus = response.status;
+				  globalActive = response.active;
+				  globalDistCentCode = response.distributionCenterCode;
+				  globalDistCentName = response.distributionCenterLocation;
+				  globalAuditStatus = response.auditStatus;
+
+			  },
+			  error: function(){      
+				   alert('Error while Edit request..');
+			  }
+		
+		})
+		
+	}
+}
+
+function sendAjaxRequestForGetAttributeDetails(selectedValue){
+	 
+	
+	 OnChangeonLoad();
+	 if(selectedValue != 0){
+		 $("#loader").show();
+	 	var requestData ={};
+	    var data;
+	    var headervalue=selectedValue;
+	
+	    requestData["header"]=jQuery.trim($('#areaId').val());
+	   
+	    $.ajax({
+			  type: "post",
+			  url: "/getAttributes",
+			  cache: false,    
+			  data:requestData,
+			  dataType : 'json',
+			  success: function(response){
+				  OnChangeonLoad();
+			
+			 		data=response.length;
+			 	for(i=0;i<response.length;i++){
+			 		// console.log("Header Value:"+headervalue)
+		
+			 			if(response[i].attributeName == 'Category'){				
+			 				var option = "<option value ='" + response[i].fieldName.trim() + " '>" +response[i].fieldName.trim()  +  "</option>";
+				            	
+					            if(globalCat != undefined){
+							        if(globalCat.trim() === response[i].fieldName.trim()){
+							        	 var option = "<option value ='" + globalCat.trim() + "' selected='seleted'>" + globalCat.trim() +  "</option>";
+							        }
+					            }
+					            
+					            $("#categoryFieldValues").append(option);
+				            $("#categoryField").show();
+			 			}else if(response[i].attributeName == 'Sub-Category'){
+				 			var option = "<option value =' " + response[i].fieldName + " '>" +response[i].fieldName  +  "</option>";
+				 			
+				 			if(globalSubCat != undefined){
+						        if(globalSubCat.trim() === response[i].fieldName.trim()){
+						        	 var option = "<option value ='" + globalSubCat.trim() + "' selected='seleted'>" + globalSubCat.trim() +  "</option>";
+						        }
+				            }
+				            $("#subCategoryFieldValues").append(option);
+				            $("#subCategoryField").show();
+				         }else if(response[i].attributeName == 'Brand'){   
+				        	 var option = "<option value =' " + response[i].fieldName + " '>" +response[i].fieldName  +  "</option>";
+				        	
+				        	 if(globalBrand != undefined){
+							        if(globalBrand.trim() === response[i].fieldName.trim()){
+							        	 var option = "<option value ='" + globalBrand.trim() + "' selected='seleted'>" + globalBrand.trim() +  "</option>";
+							        }
+					            }
+				        	 $("#BrandFieldValues").append(option);
+					         $("#BrandField").show();	        	 
+				 		}else if(response[i].attributeName == 'DocType'){
+				 			var option = "<option value =' " + response[i].fieldId + " '>" +response[i].fieldName  +  "</option>";
+				 			 console.log("globalDocType--->" + globalDocType);
+				        	 console.log("Value--->" + response[i].fieldName.trim());
+				 			if(globalDocType != undefined){
+						        if(globalDocType.trim() === response[i].fieldId.trim()){
+						        	 var option = "<option value ='" + response[i].fieldId + "' selected='seleted'>" + response[i].fieldName.trim() +  "</option>";
+						        }
+				            }
+				 			
+				 			
+				            $("#docTypeFieldValues").append(option);
+				            $("#docTypeFieldValues").attr('required',true);
+				            $("#docTypeField").show();
+				 		}else if(response[i].attributeName == 'DocName'){
+				 			$("#docNameId").attr('required',true);
+							$("#docNameField").show();
+				 			
+				 		}else if(response[i].attributeName == 'DocNumber'){
+				 			$("#docNumberId").attr('required',true);
+					        $("#docNumberField").show();
+				 		}else if(response[i].attributeName == 'Status'){
+				 			var option = "<option value =' " + response[i].fieldName + " '>" +response[i].fieldName  +  "</option>";
+					 			
+				 				if(globalStatus != undefined){
+							        if(globalStatus.trim() === response[i].fieldName.trim()){
+							        	 var option = "<option value ='" + response[i].fieldName + "' selected='seleted'>" + response[i].fieldName.trim() +  "</option>";
+							        }
+					            }
+				 			
+				 			$("#statusFieldValues").append(option);
+				            $("#statusField").show();
+				 		}else if(response[i].attributeName == 'CreatedOn'){
+				 			$("#dateId").attr('required', true);
+				 			 $("#DateField").show(); 	
+				 		}else if(response[i].attributeName == 'ArticleCode'){
+				 			var option = "<option value =' " + response[i].fieldName + " '>" +response[i].fieldName  +  "</option>";
+					 			if(globalArtCode != undefined){
+							        if(globalArtCode.trim() === response[i].fieldName.trim()){
+							        	 var option = "<option value ='" + response[i].fieldName + "' selected='seleted'>" + response[i].fieldName.trim() +  "</option>";
+							        }
+					            }
+				 			
+				 			$("#articleCodeFieldValues").append(option);
+				            $("#ArticleCodeField").show();
+			 			
+				 		}else if(response[i].attributeName == 'Productdetails'){
+				 			var option = "<option value =' " + response[i].fieldName + " '>" +response[i].fieldName  +  "</option>";
+				 			
+				 			if(globalProductDetail != undefined){
+						        if(globalProductDetail.trim() === response[i].fieldName.trim()){
+						        	 var option = "<option value ='" + response[i].fieldName + "' selected='seleted'>" + response[i].fieldName.trim() +  "</option>";
+						        }
+				            }
+				 			
+				 			$("#ProductDetailsFieldValues").append(option);
+				            $("#ProductDetailsField").show();
+			 			
+				 		}else if(response[i].attributeName == 'SupplierCode'){
+				 			var option = "<option value =' " + response[i].fieldName + " '>" +response[i].fieldName  +  "</option>";
+				 			
+				 			if(globalSupplierCode != undefined){
+						        if(globalSupplierCode.trim() === response[i].fieldName.trim()){
+						        	 var option = "<option value ='" + response[i].fieldName + "' selected='seleted'>" + response[i].fieldName.trim() +  "</option>";
+						        }
+				            }
+				 			
+				 			
+				 			$("#SuppliercodeFieldValues").append(option);
+				            $("#SuppliercodeField").show();
+			 			
+				 		}else if(response[i].attributeName == '3PManufacturersname'){
+				 			var option = "<option value =' " + response[i].fieldName + " '>" +response[i].fieldName  +  "</option>";
+				 			
+				 			if(globalManufacturerName != undefined){
+						        if(globalManufacturerName.trim() === response[i].fieldName.trim()){
+						        	 var option = "<option value ='" + response[i].fieldName + "' selected='seleted'>" + response[i].fieldName.trim() +  "</option>";
+						        }
+				            }
+				 			
+				 			$("#ManufactureNameFieldValues").append(option);
+				            $("#ManufactureNameField").show();
+			 			
+				 		}else if(response[i].attributeName == 'address'){
+				 			
+				 			if(headervalue==17 || headervalue==18 || headervalue==19 || headervalue==20){
+				 				
+				 			$("#addressId").attr('required',true);
+				 			}
+					        $("#AddressField").show();
+			 			
+				 		} else if(response[i].attributeName == 'ContactPerson'){
+				 			//$("#personId").attr('required',true);
+					        $("#pesronField").show();
+				 		}else if(response[i].attributeName == 'ContactNumber'){
+				 			//$("#numberId").attr('required',true);
+					        $("#numberField").show();
+				 		}else if(response[i].attributeName == 'region' ){
+				 			var option = "<option value =' " + response[i].fieldName + " '>" +response[i].fieldName  +  "</option>";
+				 			
+				 			if(globalRegion != undefined){
+						        if(globalRegion.trim() === response[i].fieldName.trim()){
+						        	 var option = "<option value ='" + response[i].fieldName + "' selected='seleted'>" + response[i].fieldName.trim() +  "</option>";
+						        }
+				            }				 			
+				 			$("#regionFieldValues").append(option);
+				            $("#regionField").show();
+				 		} else if(response[i].attributeName == 'RawMaterialDescription'){
+				 			if(headervalue==17 ){
+				 			$("#rawMaterialDescId").attr('required',true);
+				 			}
+					        $("#rawMaterialDescField").show();
+				 		} else if(response[i].attributeName == 'RawmaterialSuppliername'){
+				 			if(headervalue==17 ){
+				 			$("#rawMaterialsupnameId").attr('required',true);
+				 			}
+					        $("#rawMaterialSupnameField").show();
+				 		}else if(response[i].attributeName == 'PackagingMaterialDescription'){
+				 			if(headervalue==18 ){
+				 			$("#packagingMaterialDescId").attr('required',true);
+				 			}
+					        $("#packagingMaterialDescField").show();
+				 		} else if(response[i].attributeName == 'PackagingMaterialSuppliername'){
+				 			if(headervalue==18 ){
+				 			$("#packagingMaterialsupnameId").attr('required',true);
+				 			}
+					        $("#packagingMaterialSupnameField").show();
+				 		}else if(response[i].attributeName == 'AuditDate'){
+				 			$("#auditdateId").attr('required', true);
+				 			 $("#AuditDateField").show(); 	
+				 		}else if(response[i].attributeName == 'NextDue'){
+				 			$("#nextduedateId").attr('required', true);
+				 			$("#nextdueDateField").show(); 	
+				 		}else if(response[i].attributeName == 'AuditScore'){
+				 			$("#auditscoreId").attr('required',true);
+					        $("#auditscoreField").show();
+				 		}else if(response[i].attributeName == 'AuditStatus'){
+				 			var option = "<option value =' " + response[i].fieldName + " '>" +response[i].fieldName  +  "</option>";
+				 			
+				 			if(globalAuditStatus != undefined){
+						        if(globalAuditStatus.trim() === response[i].fieldName.trim()){
+						        	 var option = "<option value ='" + response[i].fieldName + "' selected='seleted'>" + response[i].fieldName.trim() +  "</option>";
+						        }
+				            }
+				 			
+				 			$("#auditstatusId").append(option);
+					        $("#auditstatusField").show();
+				 		}else if(response[i].attributeName == 'CertificationAvailable'){
+				 			$("#certificationId").attr('required',true);
+					        $("#certificationField").show();
+				 		}else if(response[i].attributeName == 'DistributionCenterCode'){
+				 			var option = "<option value =' " + response[i].fieldName + " '>" +response[i].fieldName  +  "</option>";
+				 			
+				 			if(globalDistCentCode != undefined){
+						        if(globalDistCentCode.trim() === response[i].fieldName.trim()){
+						        	 var option = "<option value ='" + response[i].fieldName + "' selected='seleted'>" + response[i].fieldName.trim() +  "</option>";
+						        }
+				            }
+				 			
+				 			$("#DistributionCodeFieldValues").append(option);
+				            $("#DistributionCodeField").show();
+				 		}else if(response[i].attributeName == 'DistributionCenterLocation'){
+				 			var option = "<option value =' " + response[i].fieldName + " '>" +response[i].fieldName  +  "</option>";
+				 			
+				 			if(globalDistCentName != undefined){
+						        if(globalDistCentName.trim() === response[i].fieldName.trim()){
+						        	 var option = "<option value ='" + response[i].fieldName + "' selected='seleted'>" + response[i].fieldName.trim() +  "</option>";
+						        }
+				            }
+				 			
+				 			$("#DistributionLocationFieldValues").append(option);
+				            $("#DistributionLocationField").show();
+				 		}else if(response[i].attributeName == 'Docstatus'){
+				 			var option = "<option value =' " + response[i].fieldName + " '>" +response[i].fieldName  +  "</option>";
+				 			
+				 			if(globalStatus != undefined){
+						        if(globalStatus.trim() === response[i].fieldName.trim()){
+						        	 var option = "<option value ='" + response[i].fieldName + "' selected='seleted'>" + response[i].fieldName.trim() +  "</option>";
+						        }
+				            }
+				 			
+				 			$("#docstatusFieldValues").append(option);
+				            $("#docstatusField").show();
+				 		}
+				 		else if(response[i].attributeName == 'Active'){
+				 			var option = "<option value =' " + response[i].fieldName + " '>" +response[i].fieldName  +  "</option>";
+				 			
+				 			if(globalActive != undefined){
+						        if(globalActive.trim() === response[i].fieldName.trim()){
+						        	 var option = "<option value ='" + response[i].fieldName + "' selected='seleted'>" + response[i].fieldName.trim() +  "</option>";
+						        }
+				            }
+				 			
+				 			$("#activeFieldValues").append(option);
+				            $("#activeField").show();
+				 		}
+				 		else if(response[i].attributeName == 'RawmaterialArticlecode'){
+					        $("#rawMaterialartcodeField").show();
+				 		}
+				 		else if(response[i].attributeName == 'RawmaterialSuppliercode'){
+					        $("#rawMaterialsuppliercodeField").show();
+				 		}else if(response[i].attributeName == 'PackagingMaterialArticlecode'){
+				 			//$("#packagingMaterialartcodeId").attr('required',true);
+					        $("#packagingMaterialartcodeField").show();
+				 		}else if(response[i].attributeName == 'PackagingMaterialSuppliercode'){
+				 			//$("#packagingMaterialsupcodeId").attr('required',true);
+					        $("#packagingMaterialsuppliercodeField").show();
+				 		}else if(response[i].attributeName == 'Category2'){
+				 			$("#category2Id").attr('required',true);
+					        $("#category2Field").show();
+				 		}else if(response[i].attributeName == 'Sub-Category2'){
+				 			$("#subcategory2Id").attr('required',true);
+					        $("#subcategory2Field").show();
+				 		}else if(response[i].attributeName == 'Brand2'){
+				 			$("#brand2Id").attr('required',true);
+					        $("#brand2Field").show();
+				 		}else if(response[i].attributeName == 'New3PManufacturersname'){
+				 			$("#newmanufactureId").attr('required',true);
+					        $("#newmanufactureField").show();
+				 		}
+			 			$("#browseField").show();
+			 			$("#browseId").attr('required',true);
+			 			
+			        	$("#allButtonField").show();
+			        	//$("#loader").hide();
+	 		      }
+			 	$("#loader").hide();
+			  },
+			  error: function(){      
+			   alert('Error while request..');
+			  }
+			  
+		});
+	    
+	 }
+	 
+}
+
+	function OnChangeonLoad(){
+		$("#categoryFieldValues").empty();
+		$("#categoryField").hide();
+	
+		$("#browseId").empty();
+	    $("#browseId").attr("required",false);
+	    $("#browseField").hide();
+		
+	    $("#subCategoryFieldValues").empty();
+	//	$("#subCategoryFieldValues").attr("required",true);​​​​​
+		$("#subCategoryField").hide();
+		
+		$("#docTypeFieldValues").empty();
+		$("#docTypeFieldValues").attr("required",false);
+		$("#docTypeField").hide();
+		
+		$("#statusFieldValues").empty();
+		//$("#statusFieldValues").attr("required",false);​​​​​
+		$("#statusField").hide();
+		
+		$("#BrandFieldValues").empty();
+	//	$("#BrandFieldValues").attr("required",false);​​​​​
+		$("#BrandField").hide();
+	
+		$("#articleCodeFieldValues").empty();
+		$("#ArticleCodeField").hide();
+		
+		$("#ProductDetailsFieldValues").empty();
+		$("#ProductDetailsField").hide();
+	
+		$("#SuppliercodeFieldValues").empty();
+		$("#SuppliercodeField").hide();
+		
+		$("#ManufactureNameFieldValues").empty();
+		$("#ManufactureNameField").hide();
+		
+		$("#regionFieldValues").empty();
+		$("#regionField").hide();
+		
+		$("#docstatusFieldValues").empty();
+		$("#docstatusField").hide();
+		
+		$("#activeFieldValues").empty();
+		$("#activeField").hide();
+
+
+		$("#addressId").empty();
+		$("#addressId").attr("required",false);
+		$("#AddressField").hide();
+		
+		$("#rawMaterialsupcodeId").empty();
+		$("#rawMaterialsupcodeId").attr("required",false);
+		$("#rawMaterialsuppliercodeField").hide();
+		
+		$("#rawMaterialartcodeId").empty();
+		$("#rawMaterialartcodeId").attr("required",false);
+		$("#rawMaterialartcodeField").hide();
+		
+		$("#packagingMaterialartcodeId").empty();
+		$("#packagingMaterialartcodeId").attr("required",false);
+		$("#packagingMaterialartcodeField").hide();
+		
+
+		$("#packagingMaterialsupcodeId").empty();
+		$("#packagingMaterialsupcodeId").attr("required",false);
+		$("#packagingMaterialsuppliercodeField").hide();
+		
+		$("#personId").empty();
+		//$("#personId").attr("required",false);
+		$("#pesronField").hide();
+		
+		$("#rawMaterialDescId").empty();
+		$("#rawMaterialDescId").attr("required",false);
+		$("#rawMaterialDescField").hide();
+		
+		$("#rawMaterialsupnameId").empty();
+		$("#rawMaterialsupnameId").attr("required",false);
+		$("#rawMaterialSupnameField").hide();
+		
+		$("#packagingMaterialDescId").empty();
+		$("#packagingMaterialDescId").attr("required",false);
+		$("#packagingMaterialDescField").hide();
+		
+		$("#packagingMaterialsupnameId").empty();
+		$("#packagingMaterialsupnameId").attr("required",false);
+		$("#packagingMaterialSupnameField").hide();
+			
+		$("#numberId").empty();
+	//	$("#numberId").attr("required",false);
+		$("#numberField").hide();
+		
+		$("#certificationId").empty();
+		$("#certificationId").attr("required",false);
+		$("#certificationField").hide();
+		
+		$("#DistributionCodeFieldValues").empty();
+		$("#DistributionCodeField").hide();
+		
+		$("#DistributionLocationFieldValues").empty();
+		$("#DistributionLocationField").hide();
+
+		$("#docNameId").empty();
+		$("#docNameId").attr("required",false);
+		$("#docNameField").hide();
+		
+		$("#docNumberId").empty();
+		$("#docNumberId").attr('required',false);
+		$("#docNumberField").hide();
+		
+		$("#category2Id").empty();
+		$("#category2Id").attr('required',false);
+		$("#category2Field").hide();
+		
+		$("#subcategory2Id").empty();
+		$("#subcategory2Id").attr('required',false);
+		$("#subcategory2Field").hide();
+		
+		$("#brand2Id").empty();
+		$("#brand2Id").attr('required',false);
+		$("#brand2Field").hide();
+		
+		$("#newmanufactureId").empty();
+		$("#newmanufactureId").attr('required',false);
+		$("#newmanufactureField").hide();
+			
+		$("#auditdateId").empty();
+		$("#auditdateId").attr('required',false);
+		$("#AuditDateField").hide(); 
+		
+		$("#nextduedateId").empty();
+		$("#nextduedateId").attr('required',false);
+		$("#nextdueDateField").hide(); 	
+		
+		$("#auditscoreId").empty();
+		$("#auditscoreId").attr("required",false);
+		$("#auditscoreField").hide();
+		
+		$("#auditstatusId").empty();
+		//$("#auditstatusId").attr("required",false);
+		$("#auditstatusField").hide();
+		
+		
+		$("#dateId").empty();
+		$("#dateId").attr('required',false);
+		$("#DateField").hide(); 
+		
+	 	$("#allButtonField").hide();
+			
+	}	    
+			 	
+	function userManagmentAction() {
+		window.location.href = "/searchuser"
+	}
+	function logout() {
+		window.location.href = "/logout"
+	}
+	function redirectHome() {
+		window.location.href = "/redirecthome"
+	}
+	function backScreen(moduleId) {
+		window.location.href ="/getFolderDetails/" + moduleId;
+			
+	}
+	
+	
+	/*]]>*/	
+</script>
+</head>
+<body>
+	<!--HEADER START-->
+	<div class="header">
+		<div class="header_inner">
+			<div class="inner_logo">
+				<img src="/images/inner_logo.png" alt="Quality Management System" onclick="redirectHome()"
+					title="Quality Management System" />
+			</div>
+			<div class="header_right">
+				<span  STYLE="color: white; font-size: 10pt"> User:</span>
+            	<span  STYLE="color: white; font-size: 10pt" th:text="${session.SESSION_USER_VO.firstName + ' ' +session.SESSION_USER_VO.lastName}" 
+             			th:if="${session.SESSION_USER_VO != null}" >
+             	</span>
+				<button th:if="${session.SESSION_USER_VO != null and session.SESSION_USER_VO.role.roleId == 1}" class="common_btn width100" onclick="userManagmentAction()">
+					<img src="/images/group_user_icon.png" class="icon_mr" 
+						alt="User management" title="User management"/>User Management
+				</button>
+				<span class="header_logout">
+                   <button class="common_btn width100" onclick="logout()"><img src="/images/logout_icon.png" class="icon_mr" alt="logout" title="logout"/>Logout</button>
+              	</span>
+			</div>
+		</div>
+	</div>
+	<!--HEADER END-->
+	<!--   <div class="watermark">
+		<img src="/images/watermark_4.png" />
+	</div>  -->
+	<div class="form_detail">
+	<div style="font-size:30px;color:green;padding-left:40%" th:text="${successMessage}"></div>
+		<form id="documentForm" method="post" action="#"
+			th:action="@{/saveDocumentDetail}" th:object="${documentDetails}"
+			enctype="multipart/form-data">
+			<input type="hidden" th:field="*{moduleId}"/>
+			
+			<input id="setDocDetailId" type="hidden" th:field="*{docDetailId}"/>
+		<!-- 	<input id="headerId" type="hidden" th:field="*{mstHeader.headerId}"/>  -->
+			
+			
+			
+			<div class="">
+				<img src="/images/back_arrow_icon.png" alt="Back" title="Back" th:onclick="|backScreen('${session.MODULE_ID}')|" />
+			</div>
+			
+			<div class="area" >
+				<div class="col-25">
+					<label for="cat">Select Area</label>
+				</div>
+				<div class="col-75">
+					 <select th:field="*{mstHeader.headerId}" class="select_arrow" id="areaId"  style="width:50%" required="required" >
+							<option th:each="cat : ${headers}" th:value="${cat.headerId}"
+								th:text="${cat.headerName}"></option>
+						</select>
+				</div>
+			</div>
+		 
+			<!-- 	<div class="row" >
+				<div class="col-25"></div>
+				<div class="col-75">
+					<input type="button" id="backBtn" value="Back" th:onclick="|backScreen('${session.MODULE_ID}')|" />
+				</div>
+			</div> -->
+	<div class="loader-circle" id="loader"> 
+	</div> 		
+ 
+			<div class="bag-fields">
+			<div class="bag-field" id="categoryField">
+					<div class="col-25">
+						<label for="cat">Category</label>
+					</div>
+					<div class="col-75">
+						<select class="select_arrow" th:field="*{categoryName}" id="categoryFieldValues"  style="width:50%" ></select>
+					</div>
+			</div>
+			<div class="bag-field" id="subCategoryField">
+				<div class="col-25">
+					<label for="subcat">Sub-Category</label>
+				</div>
+				<div class="col-75">
+				<select class="select_arrow" th:field="*{subCategoryName}" id="subCategoryFieldValues"  style="width:50%"></select>
+				</div>
+			</div>
+			
+			<div class="bag-field" id="docNameField" hidden="true">
+				<div class="col-25 ">
+					<label for="docname">Document Name</label>
+				</div>
+				<div class="col-75 ">
+					<input type="text" id="docNameId" th:field="*{docName}" required="required"
+						placeholder="Please enter Doc-Name" style="width:50%" />
+				</div>
+			</div>
+			<div class="bag-field" id="docNumberField" >
+				<div class="col-25  " >
+					<label for="docnumber">Document Number</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="docNumberId" th:field="*{docNumber}" required="required"
+						placeholder="Please enter Doc Number" style="width:50%"/>
+				</div>
+			</div>
+			<div class="bag-field" id="docTypeField" >
+				<div class="col-25">
+					<label for="doctype">Document Type</label>
+				</div>
+				<div class="col-75">
+					<select class="select_arrow" th:field="*{docType}" id="docTypeFieldValues" required="required" style="width:50%"></select>
+				</div>
+			</div>
+				<div class="bag-field" id="category2Field">
+				<div class="col-25">
+					<label for="category2">Category 2</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="category2Id" th:field="*{cat2}" required="required"
+						placeholder="Please enter Category.." style="width:50%" />
+				</div>
+			</div>
+				<div class="bag-field" id="subcategory2Field" >
+				<div class="col-25">
+					<label for="subcategory2">Sub-Category 2</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="subcategory2Id" th:field="*{subcat2}" required="required"
+						placeholder="Please enter Sub Category" style="width:50%"/>
+				</div>
+			</div>
+				<div class="bag-field" id="BrandField" >
+				<div class="col-25">
+					<label for="status">Brand</label>
+				</div>
+				<div class="col-75">
+					 <select th:field="*{Brand}" class="select_arrow" id="BrandFieldValues"  style="width:50%" >
+						</select>
+					
+				</div>
+			</div>	
+			<div class="bag-field" id="brand2Field" >
+				<div class="col-25">
+					<label for="brand2">Brand 2</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="brand2Id" th:field="*{brand2}" required="required"
+						placeholder="Please enter Brand" style="width:50%"/>
+				</div>
+			</div>
+		 <div class="bag-field" id="ArticleCodeField" >
+				<div class="col-25">
+					<label for="article">Article Code</label>
+				</div>
+				<div class="col-75">
+					 <select th:field="*{articleCode}" class="select_arrow" id="articleCodeFieldValues"  style="width:50%" >
+						</select>
+					
+				</div>
+			</div> 
+			<div class="bag-field" id="rawMaterialDescField" >
+				<div class="col-25">
+					<label for="rawmaterialdesc">Raw Material Description</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="rawMaterialDescId" th:field="*{rawmaterialDesc}" 
+						 style="width:50%"/>
+				</div>
+			</div>
+			<div class="bag-field" id="rawMaterialsuppliercodeField" >
+				<div class="col-25">
+					<label for="rawmaterialsupcode">Raw Material Supplier Code</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="rawMaterialsupcodeId" th:field="*{rawmaterialSupcode}" 
+						 style="width:50%"/>
+				</div>
+			</div>
+				<div class="bag-field" id="rawMaterialartcodeField" >
+				<div class="col-25">
+					<label for="rawmaterialarticlecode">Raw Material Article Code</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="rawMaterialartcodeId" th:field="*{rawmaterialArtcode}" 
+						 style="width:50%"/>
+				</div>
+			</div>
+			<div class="bag-field" id="rawMaterialSupnameField" >
+				<div class="col-25">
+					<label for="rawmaterialsupname">Raw Material Supplier Name</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="rawMaterialsupnameId" th:field="*{rawmaterialSuppliername}" 
+						 style="width:50%"/>
+				</div>
+			</div>	
+			<div class="bag-field" id="ProductDetailsField" >
+				<div class="col-25">
+					<label for="product">Product Details</label>
+				</div>
+				<div class="col-75">
+					 <select th:field="*{productDetails}" class="select_arrow" id="ProductDetailsFieldValues"  style="width:50%" >
+						</select>
+					
+				</div>
+			</div>	
+			<div class="bag-field" id="packagingMaterialDescField" >
+				<div class="col-25">
+					<label for="packagingmaterialdesc">Packaging Material Description</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="packagingMaterialDescId" th:field="*{packagingMaterialDesc}" 
+						 style="width:50%"/>
+				</div>
+			</div>
+				<div class="bag-field" id="packagingMaterialSupnameField" >
+				<div class="col-25">
+					<label for="packagingmaterialsupname">Packaging Material Supplier Name</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="packagingMaterialsupnameId" th:field="*{packagingMaterialSupName}" 
+						 style="width:50%"/>
+				</div>
+			</div>	
+				<div class="bag-field" id="packagingMaterialsuppliercodeField" >
+				<div class="col-25">
+					<label for="packagingmaterialsupcode">Packaging Material Supplier Code</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="packagingMaterialsupcodeId" th:field="*{packagingmaterialsupcode}" 
+						 style="width:50%"/>
+				</div>
+			</div>	
+			<div class="bag-field" id="packagingMaterialartcodeField" >
+				<div class="col-25">
+					<label for="packagingmaterialarticlecode">Packaging Material Article Code</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="packagingMaterialartcodeId" th:field="*{packagingmaterialartcode}" 
+						 style="width:50%"/>
+				</div>
+			</div>
+			<div class="bag-field" id="SuppliercodeField" >
+				<div class="col-25">
+					<label for="suppliercode">3P Supplier Code</label>
+				</div>
+				<div class="col-75">
+					 <select th:field="*{supplierCode}" class="select_arrow" id="SuppliercodeFieldValues"  style="width:50%">
+						</select>
+					
+				</div>
+			</div>	
+				<div class="bag-field" id="ManufactureNameField" >
+				<div class="col-25">
+					<label for="manufacture">3P Manufacturer's Name</label>
+				</div>
+				<div class="col-75">
+					 <select th:field="*{Manufacturename}" class="select_arrow" id="ManufactureNameFieldValues"  style="width:50%">
+						</select>
+					
+				</div>
+			</div>
+			<div class="bag-field" id="newmanufactureField" >
+				<div class="col-25">
+					<label for="newmanufacture">New 3P Manufacturer's Name</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="newmanufactureId" th:field="*{new3pmanufacture}" required="required"
+						 style="width:50%"/>
+				</div>
+			</div>	
+							
+			<div class="bag-field" id="DistributionCodeField" >
+				<div class="col-25">
+					<label for="distribution">Distribution Center Code</label>
+				</div>
+				<div class="col-75">
+					 <select th:field="*{distributionCenterCode}" class="select_arrow" id="DistributionCodeFieldValues"  style="width:50%">
+						</select>
+					
+				</div>
+			</div>
+			<div class="bag-field" id="DistributionLocationField" >
+				<div class="col-25">
+					<label for="distributioncenter">Distribution Center Location</label>
+				</div>
+				<div class="col-75">
+					 <select th:field="*{distributionCenterLocation}" class="select_arrow" id="DistributionLocationFieldValues"  style="width:50%">
+						</select>
+					
+				</div>
+			</div>
+			<div class="bag-field" id="AddressField" >
+				<div class="col-25">
+					<label for="address">Address</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="addressId" th:field="*{Address}" 
+						 style="width:50%"/>
+				</div>
+			</div>	
+		<div class="bag-field" id="regionField" >
+				<div class="col-25">
+					<label for="region">Region</label>
+				</div>
+				<div class="col-75">
+					 <select th:field="*{Region}" class="select_arrow" id="regionFieldValues"  style="width:50%" >
+						</select>
+					
+				</div>
+			</div>	
+			<div class="bag-field" id="AuditDateField" >
+				<div class="col-25">
+					<label for="auditdate">Audit Date</label>
+				</div>
+				<div class="col-75">
+					<input type="date" id="auditdateId" required="required" th:field="*{auditDate}" 
+						 style="width:50%" />
+				</div>
+			</div>	
+			
+				
+				<div class="bag-field" id="pesronField" >
+				<div class="col-25">
+					<label for="person">Contact Person</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="personId" th:field="*{ContactPerson}" 
+						 style="width:50%"/>
+				</div>
+			</div>
+			
+				<div class="bag-field" id="numberField" >
+				<div class="col-25">
+					<label for="number">Contact Number</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="numberId" th:field="*{ContactNumber}" 
+						 style="width:50%"/>
+				</div>
+			</div>
+				<div class="bag-field" id="activeField" >
+				<div class="col-25">
+					<label for="active">Active</label>
+				</div>
+				<div class="col-75">
+					 <select th:field="*{active}" class="select_arrow" id="activeFieldValues"  style="width:50%">
+						</select>
+					
+				</div>
+			</div>
+			
+			<div class="bag-field" id="docstatusField" >
+				<div class="col-25">
+					<label for="docstatus">Status</label>
+				</div>
+				<div class="col-75">
+					 <select th:field="*{docstatus}" class="select_arrow" id="docstatusFieldValues"  style="width:50%">
+						</select>
+					
+				</div>
+			</div>
+				<div class="bag-field" id="auditscoreField" >
+				<div class="col-25">
+					<label for="auditscore">Audit Score</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="auditscoreId" th:field="*{auditScore}" required="required"
+						 style="width:50%"/>
+				</div>
+			</div>
+			<div class="bag-field" id="auditstatusField" >
+				<div class="col-25">
+					<label for="auditstatus">Audit Status</label>
+				</div>
+				<div class="col-75">
+				<select th:field="*{auditStatus}" class="select_arrow" id="auditstatusId"  style="width:50%">
+						</select>
+					
+				</div>
+			</div>
+			<div class="bag-field" id="nextdueDateField" >
+				<div class="col-25">
+					<label for="nextduedate">Next Due</label>
+				</div>
+				<div class="col-75">
+					<input type="date" id="nextduedateId" required="required" th:field="*{nextDueDate}" 
+						 style="width:50%" />
+				</div>
+			</div>	
+			<div class="bag-field" id="DateField" >
+				<div class="col-25">
+					<label for="docname">Created On</label>
+				</div>
+				<div class="col-75">
+					<input type="date" id="dateId" required="required" th:field="*{createdDate}" 
+						 style="width:50%" />
+				</div>
+			</div>	
+			
+				<div class="bag-field" id="certificationField" >
+				<div class="col-25">
+					<label for="certification">Certification Available</label>
+				</div>
+				<div class="col-75">
+					<input type="text" id="certificationId" th:field="*{Certificationavailable}" required="required"
+						 style="width:50%"/>
+				</div>
+			</div>
+			<div class="bag-field" id="browseField" >
+				<div class="col-25">
+					<label for="browse">Browse</label>
+				</div>
+				<div class="col-75">
+					<input type="file" name="browsename" id="browseId" required="required"
+						placeholder="Upload File" accept=".gif,.jpg,.jpeg,.png,.doc,.xlsx,.pdf,.xls,.csv" multiple="true"/>
+				</div>
+			</div>	
+			</div>
+			
+				<div class="" id="allButtonField" style="float:left;width:60%;margin-left:300px;margin-bottom:50px">
+				<div class="col-25"></div>
+				<div class="col-75">
+					<input type="submit" name="action" value="Save"/>
+					<!-- <input type="reset" id="resetBtn" value="Reset" />  -->
+					<input type="button" id="backBtn" value="Back" th:onclick="|backScreen('${session.MODULE_ID}')|" />
+				</div>
+			</div>
+			<div class="row" id="statusField" >
+				<div class="col-25">
+					<label for="status">Status</label>
+				</div>
+				<div class="col-75">
+					 <select th:field="*{status}" class="select_arrow" id="statusFieldValues"  style="width:30%">
+						</select>
+					
+				</div>
+			</div>
+				
+		</form>
+	</div>
+	<!--FOOTER START-->
+	<div class="footer">Copyright 2019 Future Group. All rights
+		reserved.</div>
+	<!--FOOTER END-->
+
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>  -->
+		 <script src="/js/jquery.min.js"></script>
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

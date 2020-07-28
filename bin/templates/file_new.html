@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="shortcut icon" href="images/favicon.png"
+	type="image/fav.icon" />
+<link
+	href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i"
+	rel="stylesheet" />
+<title>Quality Management System</title>
+<link href="css/bootstrap.min.css" rel="stylesheet" />
+<link href="/css/style.css" rel="stylesheet" />
+<link rel="stylesheet" href="/css/font-awesome.min.css" />
+
+<link rel="stylesheet" href="/css/layout.css" />
+
+<style>
+
+.updateContentMessage{
+	font-family: 'Roboto Condensed', sans-serif !important;
+	font-size:20px;
+	color: green;
+	padding-left: 500px;
+	margin-left: 100px;
+	margin-top: 20px;	
+}
+
+.updateContentMessage1{
+	font-family: 'Roboto Condensed', sans-serif !important;
+	font-size:20px;
+	color: red;
+	padding-left: 500px;
+	margin-left: 100px;
+	margin-top: 20px;	
+}
+
+
+.manageHeader{
+	font-family: 'Roboto Condensed', sans-serif !important;
+	font-size:25px;
+	color: #3c2e3e;
+	padding-left: 450px;
+	margin-top: 20px;	
+}
+
+</style>
+<!--  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>  --> 
+ 	  <script src="/js/jquery-1.11.0.min.js"></script>
+
+
+
+<<<<<<< HEAD
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script> 
+<!-- <script  src="/js/jquery-1.11.0.min.js"></script> -->
+=======
+>>>>>>> 38e598278afe21fcc6783a0ed88922b5dcdab0ff
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>	
+	
+<script th:inline="javascript" type="text/javascript">
+/*<![CDATA[*/	
+$(document).ready(function() {
+	$("#inputFolderName").hide();
+    $("#folder").change(function() {
+        sendAjaxRequest();  
+    });
+    
+    $("#secondChildFolder").change(function() {
+        sendAjaxRequest2ndSubFolder();
+        $("#inputFolderName").show();
+    });
+    
+    $("#secondChildFolderThird").change(function() {
+    	sendAjaxRequestFirstSubFolderThirdLevel();
+    });
+    
+    $("#1stsubfolderThird").change(function() {
+    	sendAjaxRequestSecondSubFolderThirdLevel();
+    });
+    
+    $("#2ndsubfolderThird").change(function() {
+    	sendAjaxRequestThirdSubFolderThirdLevel();
+    });
+    
+    
+    /*Start Create button hide code*/
+    $("#2ndsubfolder").change(function() {
+    	if($("#2ndsubfolder").val() == -1){
+    		$("#createFolderSecondLevelButton").hide();
+    	}else{
+    		$("#createFolderSecondLevelButton").show();	
+    	}
+    });
+	
+    $("#1stsubfolderThird").change(function() {
+    	$("#createFolderThirdLevelButton").hide();
+    });
+    
+    $("#2ndsubfolderThird").change(function() {
+    	if($("#2ndsubfolderThird").val() == -1){
+    		$("#createFolderThirdLevelButton").hide();
+    	}else{
+    		$("#createFolderThirdLevelButton").show();	
+    	}
+    });
+    
+    /*End Create button hide code*/
+    
+});
+
+	function backscreen() {
+		window.location.href = "/searchuser"
+	}
+	
+	function userManagmentAction() {
+		window.location.href = "/searchuser"
+	}
+
+
+	function compliance() {
+		window.location.href = "/quality"
+	} 
+
+	function addcontent(){
+		window.location.href="/addContent";
+	}
+
+	function logout() {
+		window.location.href = "/logout"
+	}
+	function sendAjaxRequest() {
+	    var requestData ={};
+	    var data;
+	    requestData["country"]=jQuery.trim($('#folder').val());
+	    $.ajax({
+ 			  type: "post",
+ 			  url: "/subfolder",
+ 			  cache: false,    
+ 			  data:requestData,
+ 			  dataType : 'json',
+ 			  success: function(response){
+ 				 $("#subfolder").empty();
+ 			     data=response.length;
+ 		      for(i=0;i<response.length;i++){
+ 		    	 var option = "<option value = " + response[i].errorCode + ">" +response[i].errorMessage  +  "</option>";
+		            $("#subfolder").append(option);
+ 		      }
+ 			  },
+ 			  error: function(){      
+ 			   alert('Error while request..');
+ 			  }
+ 			 });
+	}
+	
+	function sendAjaxRequest2ndSubFolder(){
+		  var requestData ={};
+		    var data;
+		    requestData["country"]=jQuery.trim($('#secondChildFolder').val());
+		    $.ajax({
+	 			  type: "post",
+	 			  url: "/subfolder",
+	 			  cache: false,    
+	 			  data:requestData,
+	 			  dataType : 'json',
+	 			  success: function(response){
+	 				 $("#2ndsubfolder").empty();
+	 			    	 data=response.length;
+	 			    	$("#2ndsubfolder").append("<option value = '-1'>" + "Select" +  "</option>");
+	 		      		 for(i=0;i<response.length;i++){
+	 		    	 		var option = "<option value = " + response[i].errorCode + ">" +response[i].errorMessage  +  "</option>";
+			           		$("#2ndsubfolder").append(option);
+	 		      		}
+	 		      		$("#createFolderSecondLevelButton").hide(); 
+	 			  },
+	 			  error: function(){      
+	 			   alert('Error while request..');
+	 			  }
+	 		});
+	}
+	
+	function sendAjaxRequestFirstSubFolderThirdLevel(){
+		  var requestData ={};
+		    var data;
+		    requestData["country"]=jQuery.trim($('#secondChildFolderThird').val());
+		    $.ajax({
+	 			  type: "post",
+	 			  url: "/subfolder",
+	 			  cache: false,    
+	 			  data:requestData,
+	 			  dataType : 'json',
+	 			  success: function(response){
+	 				 $("#1stsubfolderThird").empty();
+	 				 $("#2ndsubfolderThird").empty();
+	 			    	 data=response.length;
+	 			    	$("#1stsubfolderThird").append("<option value = '-1'>" + "Select" +  "</option>");
+	 		      		 for(i=0;i<response.length;i++){
+	 		      			var option1 = "<option value = " + response[i].errorCode + ">" +response[i].errorMessage  +  "</option>";
+	 		      			$("#1stsubfolderThird").append(option1);
+	 		      		} 
+	 			  },
+	 			  error: function(){      
+	 			   alert('Error while request..');
+	 			  }
+	 		});
+	}
+	
+	function sendAjaxRequestSecondSubFolderThirdLevel(){
+		/*currently working*/
+		  var requestData ={};
+		    var data;
+		    requestData["country"]=jQuery.trim($('#1stsubfolderThird').val());
+		    $.ajax({
+	 			  type: "post",
+	 			  url: "/subfolder",
+	 			  cache: false,    
+	 			  data:requestData,
+	 			  dataType : 'json',
+	 			  success: function(response){
+	 				 $("#2ndsubfolderThird").empty();
+	 			    	 data=response.length;
+	 			    	$("#2ndsubfolderThird").append("<option value = '-1'>" + "Select" +  "</option>");
+	 		      		 for(i=0;i<response.length;i++){
+	 		    	 		var option = "<option value = " + response[i].errorCode + ">" +response[i].errorMessage  +  "</option>";
+			           		$("#2ndsubfolderThird").append(option);
+	 		      		} 
+	 			  },
+	 			  error: function(){      
+	 			   alert('Error while request..');
+	 			  }
+	 		});
+	}
+	
+	function sendAjaxRequestThirdSubFolderThirdLevel(){
+		/*currently working*/
+		  var requestData ={};
+		    var data;
+		    requestData["country"]=jQuery.trim($('#2ndsubfolderThird').val());
+		    $.ajax({
+	 			  type: "post",
+	 			  url: "/subfolder",
+	 			  cache: false,    
+	 			  data:requestData,
+	 			  dataType : 'json',
+	 			  success: function(response){
+	 				 $("#3rdsubfolderThird").empty();
+	 			    	 data=response.length;
+	 			    	$("#3rdsubfolderThird").append("<option value = '-1'>" + "Select" +  "</option>");
+	 		      		 for(i=0;i<response.length;i++){
+	 		    	 		var option = "<option value = " + response[i].errorCode + ">" +response[i].errorMessage  +  "</option>";
+			           		$("#3rdsubfolderThird").append(option);
+	 		      		}
+	 		      		 
+	 		      		
+	 			  },
+	 			  error: function(){      
+	 			   alert('Error while request..');
+	 			  }
+	 		});
+	}
+
+	
+	
+	
+
+	/*]]>*/
+	</script>	
+
+</head>
+<body onload="noBack();" onpageshow="if (event.persisted) noBack();">
+	<!--HEADER START-->
+	<div class="header">
+		<div class="header_inner">
+			<div class="inner_logo">
+				<img src="/images/inner_logo.png" alt="Quality Management System"
+					title="Quality Management System" />
+			</div>
+			<div class="header_right">
+				<span STYLE="color: white; font-size: 10pt"> User:</span> <span
+					STYLE="color: white; font-size: 10pt"
+					th:text="${session.SESSION_USER_VO.firstName + ' ' +session.SESSION_USER_VO.lastName}"
+					th:if="${session.SESSION_USER_VO != null}"></span> <input
+					type="text" name="search" placeholder="Search" id="search" />
+				<!-- <span th:switch="${session.SESSION_USER_VO.role.roleId}" th:if="${session.SESSION_USER_VO != null}" > -->
+				<button
+					th:if="${session.SESSION_USER_VO != null and session.SESSION_USER_VO.role.roleId == 1}"
+					class="common_btn width100" onclick="userManagmentAction()">
+					<img src="/images/group_user_icon.png" class="icon_mr"
+						alt="User management" title="User management" />User management
+				</button>
+				<!--           </span> -->
+				<span class="header_logout">
+					<button class="common_btn width100" onclick="logout()">
+						<img src="/images/logout_icon.png" class="icon_mr" alt="logout"
+							title="logout" />Logout
+					</button>
+				</span>
+			</div>
+
+		</div>
+	</div>
+	<!--HEADER END-->
+	<div class="watermark">
+		<img src="/images/watermark_4.png" />
+	</div>
+	
+	<h2 class ="updateContentMessage " th:text="${Msg}"></h2>
+	<h2 class ="updateContentMessage1 " th:text="${errorMsg}"></h2>
+	<h2 class ="updateContentMessage " th:text="${pageValue}" display="none"></h2>
+<div class = "container">
+<div th:if="${PageValue=='parent'}">
+<h3 class="manageHeader">Create Parent Folder</h3><br/><br/>
+<form action="#" th:action="@{/addParent}" th:object="${createparent}" method="post">
+	<div class="row">
+		<div class="col-25">
+			<label class="control-label">Folder Name:</label>
+		</div>
+		<div class="col-75">
+			<input type="text" id="userId" required="required" maxlength="50" th:field="*{moduleName}"/>
+		</div>
+
+	</div>
+
+		<div class="row">
+			<div class="col-25"></div>
+			<div class="col-75">
+				<button class="common_btn" type="submit" name="action"
+					value="create">Create</button>
+					<button class="common_btn" type="button" id="backBtn" value="Back" onclick="backscreen()">Back</button>
+			</div>
+
+		</div>
+</form> 
+</div>
+
+
+<div th:if="${PageValue=='child'}">
+<h3 class="manageHeader">Create Child Folder</h3><br/><br/>
+<form action="#" th:action="@{/addChild}" th:object="${createchild}" method="post">
+				<div class="row">
+					<div class="col-25">
+						<label for="select" class="control-label">Select Folder:</label>
+					</div>
+					<div class="col-75">
+						<select class="select_arrow" th:field="*{moduleName}"
+							required="required">
+							<option value="" >Please Choose...</option>
+							<option th:each="module : ${ParentFolders}" th:value="${module.moduleId}" 
+								th:text="${module.moduleName}"></option>
+						</select>
+					</div>
+
+				</div>
+				<div class="row">
+		<div class="col-25">
+			<label class="control-label">Sub-Folder Name:</label>
+		</div>
+		<div class="col-75">
+			<input type="text" id="userId" required="required" maxlength="50" th:field="*{moduleName}"/>
+		</div>
+
+	</div>
+
+		<div class="row">
+			<div class="col-25"></div>
+			<div class="col-75">
+				<button class="common_btn" type="submit" name="action"
+					value="create">Create</button>
+					<button class="common_btn" type="button" id="backBtn" value="Back" onclick="backscreen()">Back</button>
+			</div>
+
+		</div>
+</form> 
+</div>
+<div th:if="${PageValue=='remove'}">
+<h3 class="manageHeader">Remove Child Folder</h3><br/><br/>
+<form action="#" th:action="@{/removeChild}" th:object="${removechild}" method="post" onsubmit="return confirm('Are you sure you want to Delete?')">
+
+				<div class="row">
+					<div class="col-25">
+						<label for="select" class="control-label">Select Folder:</label>
+					</div>
+					<div class="col-75">
+						<select class="select_arrow"  id="folder" th:field="*{moduleName}" 
+							required="required">
+							<option value="" >Please Choose...</option>
+							<option th:each="module : ${ParentFolders}" th:value="${module.moduleId}"
+								th:text="${module.moduleName}"></option>
+						</select>
+					</div>
+
+				</div>
+				<div class="row">
+					<div class="col-25">
+						<label for="select" class="control-label">Select ChildFolder:</label>
+					</div>
+					<div class="col-75">
+					
+					 <select class="select_arrow" th:field="*{moduleName}"
+								id="subfolder" required="required">
+								</select> 
+						
+					</div>
+
+				</div>
+
+		<div class="row">
+			<div class="col-25"></div>
+			<div class="col-75">
+				<button class="common_btn" type="submit" name="action"
+					value="delete">Delete</button>
+					<button class="common_btn" type="button" id="backBtn" value="Back" onclick="backscreen()">Back</button>
+			</div>
+
+		</div>
+</form> 
+</div>
+<div th:if="${PageValue=='removeparent'}">
+<h3 class="manageHeader">Remove Parent Folder</h3><br/><br/>
+<form action="#" th:action="@{/removeParent}" th:object="${removeparent}" method="post" onsubmit="return confirm('Are you sure you want to Delete?')">
+
+				<div class="row">
+					<div class="col-25">
+						<label for="select" class="control-label">Select Folder:</label>
+					</div>
+					<div class="col-75">
+						<select class="select_arrow"  id="folder" th:field="*{moduleName}" 
+							required="required">
+							<option value="" >Please Choose...</option>
+							<option th:each="module : ${ParentFolders}" th:value="${module.moduleId}"
+								th:text="${module.moduleName}"></option>
+						</select>
+					</div>
+
+				</div>
+
+		<div class="row">
+			<div class="col-25"></div>
+			<div class="col-75">
+				<button class="common_btn" type="submit" name="action"
+					value="delete">Delete</button>
+					<button class="common_btn" type="button" id="backBtn" value="Back" onclick="backscreen()">Back</button>
+			</div>
+
+		</div>
+</form> 
+</div>
+
+<div th:if="${PageValue=='secondchild'}">
+<h3 class="manageHeader">Create 2nd Level Child Folder</h3><br/><br/>
+<form action="#" th:action="@{/addSecondChild}" th:object="${secondchild}" method="post">
+				<div class="row">
+					<div class="col-25">
+						<label for="select" class="control-label">Select Parent Folder:</label>
+					</div>
+					<div class="col-75">
+						<select class="select_arrow"  id="secondChildFolder" th:field="*{moduleName}" 
+							required="required">
+							<option value="" >Please Choose...</option>
+							<option th:each="module : ${ParentFolders}" th:value="${module.moduleId}"
+								th:text="${module.moduleName}"></option>
+						</select>
+					</div>
+				</div>
+				 <div class="row">
+					<div class="col-25">
+						<label for="select" class="control-label">Select ChildFolder:</label>
+					</div>
+					<div  class="col-75"> 	  
+						<select class="select_arrow" th:field="*{moduleName}" id="2ndsubfolder" required="required"></select>
+					</div>
+				</div>
+				
+				<div class="row" id="inputFolderName">
+					<div class="col-25">
+						<label for="select" class="control-label">Enter 2nd Child Folder Name:</label>
+					</div>
+					<div class="col-75">
+						<input type="text" id="thirdChildFolder" required="required" maxlength="30" style="width:20%" th:field="*{moduleName}" />
+					</div>
+				</div>
+				
+				
+				
+		<div class="row">
+			<div class="col-75"></div><br/><br/><br/><br/>
+			<div class="col-75" style="padding-left:50%;">
+				<button class="common_btn" type="submit" name="action" value="create" style="display:none" id="createFolderSecondLevelButton">Create</button>
+				<button class="common_btn" type="button" id="backBtn" value="Back" onclick="backscreen()">Back</button>
+			</div>
+		</div>
+</form> 
+</div>
+<div th:if="${PageValue=='thirdchild'}">
+	<h3 class="manageHeader">Create 3rd Level Child Folder</h3><br/><br/>
+	<form action="#" th:action="@{/addThirdChild}" th:object="${thirdchild}" method="post">
+				<div class="row">
+					<div class="col-25">
+						<label for="select" class="control-label">Select Parent Folder:</label>
+					</div>
+					<div class="col-75">
+						<select class="select_arrow"  id="secondChildFolderThird" th:field="*{moduleName}" 
+							required="required">
+							<option value="" >Please Choose...</option>
+							<option th:each="module : ${ParentFolders}" th:value="${module.moduleId}"
+								th:text="${module.moduleName}"></option>
+						</select>
+					</div>
+				</div>
+				 <div class="row">
+					<div class="col-25">
+						<label for="select" class="control-label">Select 1st Child Folder:</label>
+					</div>
+					<div  class="col-75"> 	  
+						<select class="select_arrow" th:field="*{moduleName}" id="1stsubfolderThird" required="required"></select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-25">
+						<label for="select" class="control-label">Select 2nd Child Folder:</label>
+					</div>
+					<div  class="col-75"> 	  
+						<select class="select_arrow" th:field="*{moduleName}" id="2ndsubfolderThird" required="required"></select>
+					</div>
+				</div>
+				
+				<div class="row" id="inputFolderNameThird">
+					<div class="col-25">
+						<label for="select" class="control-label">Enter 3rd Child Folder Name:</label>
+					</div>
+					<div class="col-75">
+						<input type="text" id="thirdChildFolderOne" required="required" maxlength="30" style="width:20%" th:field="*{moduleName}" />
+					</div>
+				</div>
+				
+				
+				
+		<div class="row">
+			<div class="col-75"></div><br/><br/><br/><br/>
+			<div class="col-75" style="padding-left:50%;">
+				<button class="common_btn" type="submit" name="action" value="create"  style="display:none" id="createFolderThirdLevelButton">Create</button>
+				<button class="common_btn" type="button" id="backBtn" value="Back" onclick="backscreen()">Back</button>
+			</div>
+		</div>
+	</form> 
+</div>
+
+<div th:if="${PageValue=='removesecondchild'}">
+<h3 class="manageHeader">Remove 2nd Level Child Folder</h3><br/><br/>
+<form action="#" th:action="@{/removeSecondChild}" th:object="${removesecondchild}" method="post" onsubmit="return confirm('Are you sure you want to Delete?')">
+				<div class="row">
+					<div class="col-25">
+						<label for="select" class="control-label">Select Parent Folder:</label>
+					</div>
+					<div class="col-75">
+						<select class="select_arrow"  id="secondChildFolderThird" th:field="*{moduleName}" 
+							required="required">
+							<option value="" >Please Choose...</option>
+							<option th:each="module : ${ParentFolders}" th:value="${module.moduleId}"
+								th:text="${module.moduleName}"></option>
+						</select>
+					</div>
+				</div>
+				 <div class="row">
+					<div class="col-25">
+						<label for="select" class="control-label">Select ChildFolder:</label>
+					</div>
+					<div  class="col-75"> 	  
+						<select class="select_arrow" th:field="*{moduleName}" id="1stsubfolderThird" required="required"></select>
+					</div>
+				</div>
+			<div class="row">
+					<div class="col-25">
+						<label for="select" class="control-label">Select 2nd Child Folder:</label>
+					</div>
+					<div  class="col-75"> 	  
+						<select class="select_arrow" th:field="*{moduleName}" id="2ndsubfolderThird" required="required"></select>
+					</div>
+				</div>
+				
+				
+		<div class="row">
+			<div class="col-75"></div><br/><br/><br/><br/>
+			<div class="col-75" style="padding-left:50%;">
+				<button class="common_btn" type="submit" name="action" value="delete">Delete</button>
+				<button class="common_btn" type="button" id="backBtn" value="Back" onclick="backscreen()">Back</button>
+			</div>
+		</div>
+</form> 
+</div>
+
+<div th:if="${PageValue=='removethirdchild'}">
+	<h3 class="manageHeader">Delete 3rd Level Child Folder</h3><br/><br/>
+	<form action="#" th:action="@{/removeThirdChild}" th:object="${removethirdchild}" method="post" onsubmit="return confirm('Are you sure you want to Delete?')">
+				<div class="row">
+					<div class="col-25">
+						<label for="select" class="control-label">Select Parent Folder:</label>
+					</div>
+					<div class="col-75">
+						<select class="select_arrow"  id="secondChildFolderThird" th:field="*{moduleName}" 
+							required="required">
+							<option value="" >Please Choose...</option>
+							<option th:each="module : ${ParentFolders}" th:value="${module.moduleId}"
+								th:text="${module.moduleName}"></option>
+						</select>
+					</div>
+				</div>
+				 <div class="row">
+					<div class="col-25">
+						<label for="select" class="control-label">Select 1st Child Folder:</label>
+					</div>
+					<div  class="col-75"> 	  
+						<select class="select_arrow" th:field="*{moduleName}" id="1stsubfolderThird" required="required"></select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-25">
+						<label for="select" class="control-label">Select 2nd Child Folder:</label>
+					</div>
+					<div  class="col-75"> 	  
+						<select class="select_arrow" th:field="*{moduleName}" id="2ndsubfolderThird" required="required"></select>
+					</div>
+				</div>
+				
+			<div class="row">
+					<div class="col-25">
+						<label for="select" class="control-label">Select 3rd Child Folder:</label>
+					</div>
+					<div  class="col-75"> 	  
+						<select class="select_arrow" th:field="*{moduleName}" id="3rdsubfolderThird" required="required"></select>
+					</div>
+				</div>
+				
+				
+				
+				
+		<div class="row">
+			<div class="col-75"></div><br/><br/><br/><br/>
+			<div class="col-75" style="padding-left:50%;">
+				<button class="common_btn" type="submit" name="action" value="delete">Delete</button>
+				<button class="common_btn" type="button" id="backBtn" value="Back" onclick="backscreen()">Back</button>
+			</div>
+		</div>
+	</form> 
+</div>
+
+
+
+
+
+
+	</div>
+	<!--FOOTER START-->
+	<div class="footer">Copyright 2019 Future Group. All rights
+		reserved.</div>
+	<!--FOOTER END-->
+</body>
+
+</html>

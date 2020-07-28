@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="shortcut icon" href="/images/favicon.png" type="image/fav.icon" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i" rel="stylesheet"/>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Quality Management System</title>
+
+    <!-- Bootstrap -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/css/style.css" rel="stylesheet"/>
+    <link href="/css/bootstrap.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/css/font-awesome.min.css"/>
+    
+	<style>
+		.pagination-centered {
+    		text-align: right;
+		}
+		.disabled {
+    		pointer-events: none;
+    		opacity: 0.5;
+		}
+		.pointer-disabled {
+    		pointer-events: none;
+		}
+		#downloadDoc{
+			margin-right: 10px;
+		}
+	</style>
+ 	<script  src="/js/common.js"></script>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <!-- <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>  -->
+    	 <script src="/js/jquery-1.11.0.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>  
+    
+    <script type="text/javascript">
+    var rowNum;
+    function logout(){
+    	
+    	window.location.href = "/logout"
+    
+    }
+    
+    function redirectHome() {
+		window.location.href = "/redirecthome"
+	}
+    
+    function downloadAction() {
+		alert("called download");
+		window.location.href = "/downloadDocument"
+	}
+    $(document).ready(function() { 
+		rowNum=pagination(window.location.href);
+		
+		var addSerialNumber = function () {
+			
+    $('table tr:not(:first)').each(function() {
+        $(this).find('td:nth-child(1)').html(++rowNum);
+    });
+    addSerialNumber();
+};
+    
+    
+    </script>
+     
+    
+  </head>
+  <body>
+    <!--HEADER START-->
+    	<div class="header">
+    	
+        	<div class="header_inner">
+        	
+            	<div class="inner_logo"><img src="/images/inner_logo.png" alt="Quality Management System" onclick="redirectHome()" title="Quality Management System"/></div>
+              
+              	<div class="header_right">
+              		 <span  STYLE="color: white; font-size: 10pt"> User:</span>
+              		 <span  STYLE="color: white; font-size: 10pt" th:text="${session.SESSION_USER_VO.firstName + ' ' +session.SESSION_USER_VO.lastName}" 
+          					th:if="${session.SESSION_USER_VO != null}" >
+          			 </span>            
+                	
+                	<input type="text"  class="header_search" name="search" id="search"/>
+                    
+                    <button th:if="${session.SESSION_USER_VO != null and session.SESSION_USER_VO.role.roleId == 1}" class="common_btn width100" onclick="userManagmentAction()">
+                    	<img src="/images/group_user_icon.png" class="icon_mr" alt="User management"  title="User management"/>User management
+                    </button>
+               		<span class="header_logout">
+               		 	
+					 <button class="common_btn width100" onclick="logout()"><img src="/images/logout_icon.png" class="icon_mr" alt="logout" title="logout"/>Logout</button>
+                   		 
+              		</span>
+               </div>
+            </div>
+        </div>
+    <!--HEADER END-->
+     <div class="watermark">
+		<img src="/images/watermark_4.png" />
+	</div> 
+    <!--CONTAINER START-->
+        <div class="container">
+      <h1 id="locheader" > PREVIOUS FILES</h1>
+        	
+       			<div class="inner_heading_title" >
+       				
+                	<h1><span><img src="/images/back_arrow_icon.png" alt="Back"  onclick="redirectHome()" title="Back" /></span></h1>
+                </div> <br/> <br/>
+	
+			<table id="userTable" class="css-serial">
+				<!-- Header Table -->
+				<thead>
+					<tr>
+						<th>Sr. No</th>
+						<th>Area</th>
+						<th>Category</th>
+						<th>Brand</th>
+						<th>Sub Category</th>
+						<th>Doc Name</th>
+						<th>Doc Number</th>
+						<th>File Name</th>
+						<th>Audit Score</th>
+						<th>Audit Status</th>
+						<th>Created By</th>
+						<th>Created On</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<!-- Footer Table -->
+				<tbody>
+				<tr th:each="doc: ${oldFiles}">
+					 	<td>&nbsp;</td>
+					 	<td th:text="${doc.mstHeader.headerName}"></td>
+						<td th:text="${doc.categoryName}"></td>
+						<td th:text="${doc.Brand}"></td>
+						<td th:text="${doc.subCategoryName}"></td>
+						<td th:text="${doc.docName}" />
+						<td th:text="${doc.docNumber}" />
+						<td th:text="${doc.fileName}" />
+						<td th:text="${doc.auditScore}" />
+						<td th:text="${doc.auditStatus}" />
+						<td th:text="${doc.createdBy}" />
+						<td th:text="${#dates.format(doc.createdOn, 'dd/MM/yyyy')}" />
+						<td><!--  <a data-toggle="modal"
+							th:href="@{'/viewDocument/' + ${doc.fileName}}"><span>View</span></a>--> <!-- For Demo purpose -->
+							<a data-toggle="modal"
+							th:href="@{'/downloadDocument/' + ${doc.fileName}}"><span>Download</span></a>
+						</td>
+				
+				</tr>
+				</tbody>
+				</table>
+				
+				<div th:if="${ navigation == 'enabled'}">
+			<div th:if="${oldFiles.totalPages != 1}"
+				class="form-group col-md-11 pagination-centered">
+				<ul class="pagination">
+					<li th:class="${oldFiles.number == 0} ? disabled"><a
+						class="pageLink"
+						th:href="@{/pagination/(pageSize=${selectedPageSize}, page=1, pageName=${pageName},moduleID=${session.MODULE_ID})}">«</a></li>
+					<li th:class="${oldFiles.number == 0} ? disabled"><a
+						class="pageLink"
+						th:href="@{/pagination/(pageSize=${selectedPageSize}, page=${oldFiles.number}, pageName=${pageName},moduleID=${session.MODULE_ID})}">←</a>
+					</li>
+					<li
+						th:class="${oldFiles.number == (page - 1)} ? 'active pointer-disabled'"
+						th:each="page : ${#numbers.sequence(pager.startPage,pager.endPage)}">
+						<a class="pageLink"
+						th:href="@{/pagination/(pageSize=${selectedPageSize}, page=${page}, pageName=${pageName},moduleID=${session.MODULE_ID})}"
+						th:text="${page}"></a>
+					</li>
+					<li
+						th:class="${oldFiles.number + 1 == oldFiles.totalPages} ? disabled">
+						<a class="pageLink"
+						th:href="@{/pagination/(pageSize=${selectedPageSize}, page=${oldFiles.number + 2}, pageName=${pageName},moduleID=${session.MODULE_ID})}">→</a>
+					</li>
+					<li
+						th:class="${oldFiles.number + 1 ==oldFiles.totalPages} ? disabled">
+						<a class="pageLink"
+						th:href="@{/pagination/(pageSize=${selectedPageSize}, page=${oldFiles.totalPages}, pageName=${pageName},moduleID=${session.MODULE_ID})}">»</a>
+					</li>
+				</ul>
+			</div>
+		</div>					
+			</div>
+		
+	    <!--FOOTER START-->
+    	<div class="footer">Copyright 2019 Future Group. All rights reserved.</div>
+    <!--FOOTER END-->
+
+  <script th:inline="javascript">
+		/*<![CDATA[*/
+		$(document).ready(function() {
+			changePageAndSize();
+		});
+		function changePageAndSize() {
+			$('#pageSizeSelect').change(
+					function(evt) {
+						window.location.replace("/?pageSize=" + this.value
+								+ "&page=1");
+					});
+		}
+		/*]]>*/
+	</script>
+
+
+</body>
+</html>

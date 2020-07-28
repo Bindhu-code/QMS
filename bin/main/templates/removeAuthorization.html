@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="shortcut icon" href="/images/favicon.png"
+	type="image/fav.icon" />
+<link
+	href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i"
+	rel="stylesheet" />
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<title>Quality Management System</title>
+
+<!-- Bootstrap -->
+<link href="/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/css/style.css" rel="stylesheet" />
+<link href="/css/bootstrap.css" rel="stylesheet" />
+<link rel="stylesheet" href="/css/font-awesome.min.css" />
+
+<style>
+.pagination-centered {
+	text-align: right;
+}
+
+.disabled {
+	pointer-events: none;
+	opacity: 0.5;
+}
+
+.pointer-disabled {
+	pointer-events: none;
+}
+
+.updateContentMessage{
+	font-family: 'Roboto Condensed', sans-serif !important;
+	font-size:20px;
+	color: green;
+	padding-left: 500px;
+	margin-left: 100px
+}
+
+#downloadDoc {
+	margin-right: 10px;
+}
+
+.modal1 {
+display: none; 
+position: fixed; 
+z-index: 1; 
+padding-top:14%; 
+left: 0;
+top: 0;
+width: 100%; 
+height: 100%;
+overflow: auto;
+background-color: rgb(0,0,0); 
+background-color: rgba(0,0,0,0.4); 
+}
+.modal-content {
+background-color: #fefefe;
+margin: auto;
+padding: 20px;
+border: 1px solid #888;
+width:500px;
+}
+.close1 {
+color: #aaaaaa;
+float: left;
+font-size: 28px;
+font-weight: bold;
+}
+
+
+.close_cancel_membership {
+padding-left:400px;
+
+
+}
+.add-secondary-member-popup{ width:100%; clear:both; /*float:left;*/}
+.add-secondary-member-popup{ text-align:center;}
+
+.add-title{font-size:18px; color:black; line-height:26px;}
+.add-secondary-member-popup-btn-wrapper {width: 100%; height: auto; clear: both; text-align: center; margin: 10px 0px 10px 0px;}
+
+.select_arrow_header {width:60%; background: #ffffff url(../images/down-arrow.png) no-repeat right center !important;}
+.header_left{ width:20%; float:left; margin-top:18px;margin-left: 10%;}   
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 18px;
+
+  /*background-color: #A2C4C9 
+ background-color: #fdd9c6 */
+  background-color: #f9ceb8
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+ }
+
+.slider {
+  position: realtive;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+/* background-color: #fdad84; */
+background-color: #ccc; 
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 15px;
+  width: 15px;
+  left: 1px;
+  bottom: 1px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2ab934;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.on
+{
+  display: none;
+}
+
+.on, .off
+{
+  color: black;
+  position: absolute;
+  transform: translate(-50%,-50%);
+  top: 50%;
+  left: 50%;
+  font-size: 10px;
+  font-family: Verdana, sans-serif;
+}
+input:checked+ .slider .on
+{display: block;}
+
+input:checked + .slider .off
+{display: none;}
+
+
+</style>
+<script src="/js/common.js"></script>
+
+<!-- <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>  -->
+<script src="/js/jquery-1.11.0.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>  -->
+<script src="/js/jquery.min.js"></script>
+
+<script type="text/javascript">
+/*<![CDATA[*/
+$(document).ready(function() {
+	
+	$("#userTable").hide();
+	$("#authorization").hide();
+	
+}); 
+
+	
+	function provideRightsToUser() {
+	debugger;
+			var moduleValues = [];
+			$("input:checkbox[name=folder]:not(:checked)").each(function() {
+				
+				var module = $(this).val();
+				console.log(module);
+				//console.log(module.toString());
+				if(module.toString()===""){
+				
+				
+				}else{
+					moduleValues.push( $(this).val());
+				//	moduleValues+=",";
+					
+				}
+				
+			});
+			console.log("Modules:::"+moduleValues);
+			console.log("Modules Size:::"+moduleValues.length);
+			
+			var selectedValue = document.getElementById("userId").value;
+			var requestdata = {};
+			requestdata["finalmoduleValues"] = moduleValues;
+			requestdata["userId"] = selectedValue;
+			
+			
+			if(moduleValues.length==0){
+				
+				alert("Please select folders to proceed!!!");
+				$("#authorization").attr("disabled","disabled");
+			}else{
+				
+				$.ajax({
+				
+				type: "POST",
+				contentType: "application/json",
+				url: "/removefolderAuthorization",
+				data: JSON.stringify(requestdata),
+				dataType: 'text',
+				success: function(response){
+					
+					alert(response);
+				},
+				error: function(){
+							 alert('Error while request..');
+					  } 
+				})
+	
+			}
+			
+			
+	
+}
+
+	function redirectHome() {
+		window.location.href = "/redirecthome"
+	}
+
+	function userManagmentAction() {
+		window.location.href = "/searchuser"
+	}
+	function backScreen() {
+		window.location.href = "/backscreen"
+	}
+	function backToPreviousScreen(parentId) {
+		if (parentId == "#") {
+			window.location.href = "/redirecthome";
+		} else {
+			window.location.href = "/getFolderDetails/" + parentId;
+		}
+	}
+	function logout() {
+		window.location.href = "/logout"
+	}
+function visible(UserId){
+	 console.log("In calling By other ajax call1....!!!")
+	//	alert(UserId);
+		if(UserId!='0'){
+			console.log("Here...")
+			//window.location.href = "/getFolderDetailsByUser/" + UserId;
+			var requestData ={UserId};
+		    var data;
+		    
+		   
+			 $.ajax({
+				
+				 type: "post",
+				  url: "/getFolderDetailsByUser",
+				  cache: false,    
+				  data: requestData,
+				  dataType : 'json',
+				  success: function(response){
+					  
+					 // alert(response);
+					  if(response!=null)
+						  {
+						  		//var data = response.join("~");
+								var datafromservice = response.toString().split(",");
+								console.log("Response:::"+datafromservice[0]);
+								console.log("Response length:::"+datafromservice.length);
+							//	var dataview = datafromservice.toString().split("~");
+						  	//	data = "~" +data+"~";
+						  	//	console.log("Result:::"+data);
+						  		//alert(response.length);
+						  		//alert(data);
+						  		
+						  		for(var i =0;datafromservice.length>i ;i++){
+						  			console.log("In loop1::"+datafromservice[i]);
+						  			
+						  			var dataview = datafromservice[i].split("~");
+						  			console.log("Result in loop1::::"+dataview[0]);
+						  			console.log("Result in loop2::::"+dataview[1]);
+						  			console.log("Result in loop3::::"+dataview[2]);
+						  			$(".f"+dataview[0]).prop('checked',true);
+					  			    $(".f"+dataview[0]).prop('disabled',false);
+					  			//	$(".v"+dataview[0]).prop('disabled',false);
+					  			//	$(".d"+dataview[0]).prop('disabled',false);
+					  				
+					  				if(dataview[1]=="true"){
+					  					console.log("here to check");
+					  					//console.log("ID::"+dataview[0]);
+					  					$(".v"+dataview[0]).prop('checked',true);
+					  				}else{
+					  					$(".v"+dataview[0]).prop('checked',false);
+					  					
+					  				}
+					  				if(dataview[2]=="true"){
+					  					console.log("here to check download");
+					  					$(".d"+dataview[0]).prop('checked',true);
+					  					
+					  				}else{
+					  					$(".d"+dataview[0]).prop('checked',false);
+					  				}
+						 			  			
+						  		}
+						  			
+						  }
+					  
+				  },
+				  error: function(){      
+					   alert('Error while request..');
+					  }
+				 
+				 
+			 });
+			
+			
+			 $("#userTable").show();	
+			 $("#authorization").show();
+		}else{
+			//console.log("Here123...")
+			$("#userTable").hide();	
+		}
+		
+	 var x = document.getElementById("userTable").rows[0].cells;
+	 console.log("Table cells>>>>"+x);
+	
+	}
+
+function closePop() {
+	var modal = document.getElementById('authorizeModal');
+	var span = document.getElementsByClassName("close")[0];
+	modal.style.display = "none";
+}
+function closeButton() {
+	var modal = document.getElementById('authorizeModal');
+	var span = document.getElementsByClassName("close")[0];
+	modal.style.display = "none";
+}
+function sendId(checkedvalue){
+	
+	
+	 // console.log("Bindhu:::"+checkedvalue);
+	if($("#"+checkedvalue).is(':checked')){
+		$(".v"+checkedvalue).prop('disabled',false);
+		$(".d"+checkedvalue).prop('disabled',false);
+		
+	}else{
+		$(".v"+checkedvalue).prop('disabled',true);
+		$(".d"+checkedvalue).prop('disabled',true);
+		
+	}	
+}
+
+function checkMe(Id){
+	console.log(Id);
+	//console.log($(that).id);
+	
+	var x = Id;
+	console.log(x.length);
+	//console.log("---->>"+x.substring(3,x.length));
+	var index ;
+	var moduleId;
+	
+	if(x.length==2){
+		
+	console.log("----First>>"+x.substring(0,x.length-1));
+	console.log("----Last>>"+x.substring(1,x.length));
+	index = x.substring(1,x.length);
+	moduleId = x.substring(0,x.length-1);
+	
+	
+	}else{
+		
+		console.log("----First in else>>"+x.substring(0,x.length-1));
+		console.log("----Last in else>>"+x.substring(2,x.length));
+		moduleId = x.substring(0,x.length-1);
+		index = x.substring(2,x.length);	
+	}
+	
+	
+	var i = ++index;
+	
+	
+	for(i;i<=4;i++){
+		
+		console.log("i value>>>>"+i);
+		console.log("#"+moduleId+i);
+		//var boxes = document.getElementById("#"+moduleId+i ).checked;
+		//console.log("isChecked>>>"+boxes);
+	//	$("#"+moduleId+i).prop('checked',false);
+		
+
+		if($("#"+moduleId+i).is(":checked")){
+			
+			$("#"+moduleId+i).prop('checked',false);
+			
+		}else{
+			//$("#"+moduleId+i).prop('checked',true);
+			
+		} 
+		
+		
+		
+	}
+	
+}
+	
+/*]]>*/
+</script>
+
+</head>
+<body>
+	<!--HEADER START-->
+	<div class="header">
+
+		<div class="header_inner">
+
+			<div class="inner_logo">
+				<img src="/images/inner_logo.png" alt="Quality Management System"
+					onclick="redirectHome()" title="Quality Management System" />
+			</div>
+
+			<div class="header_right">
+			<!--  	<span STYLE="color: white; font-size: 10pt"> User:</span> <span
+					STYLE="color: white; font-size: 10pt"
+					th:text="${session.SESSION_USER_VO.firstName + ' ' +session.SESSION_USER_VO.lastName}"
+					th:if="${session.SESSION_USER_VO != null}"> </span> --><input
+					type="text" th:if="${filerec}" class="header_search" name="search"
+					id="search" />
+
+				<button
+					th:if="${session.SESSION_USER_VO != null and session.SESSION_USER_VO.role.roleId == 1}"
+					class="common_btn width100" onclick="userManagmentAction()">
+					<img src="/images/group_user_icon.png" class="icon_mr"
+						alt="User management" title="User management" />User management
+				</button>
+				<span class="header_logout">
+					
+					<button class="common_btn width100" onclick="logout()">
+						<img src="/images/logout_icon.png" class="icon_mr" alt="logout"
+							title="logout" />Logout
+					</button>
+
+				</span>
+			</div>
+		</div>
+	</div>
+
+	<!--HEADER END-->
+	<div class="watermark">
+		<img src="/images/watermark_4.png" />
+	</div>
+
+	<!--CONTAINER START-->
+	<div id="authorizeModal" class="modal1" style="display: none;">
+	 	<div class="modal-content">
+	 			<span class="close_cancel_membership" onclick="closePop()" ><img src="/images/close_icon.png" /></span>
+	 			
+	 			<div class="add-secondary-member-popup">
+	 					<span  class="add-title" id="authorizeMsg">FOLDERS ARE AUTHORIZED SUCCESSFULLY!!!</span>
+	 			</div>
+				<div class="add-secondary-member-popup-btn-wrapper">
+				<button class="common_btn"  style=" background-color:#3cb371; color:white;" type="button" id="okBtn" onclick="closeButton()" >OK</button>
+				
+				</div>
+				 
+				
+		</div>
+	</div>
+	
+	
+	 <div class="container">
+	 
+	 
+	 
+<!--   <div th:each = "doc: ${accessedFolders}">
+	 
+	 	<h1 id="locheader" th:text= "${doc.mstModule.moduleId}"></h1>
+	 
+	 
+	 </div> 
+	 
+	 
+<h1 id="locheader" th:text= "${accessedFolders}"></h1>-->	
+
+		<h2 class ="updateContentMessage " id="Msg" ></h2>
+
+
+
+     
+			<div class="">
+			 	<label for="select" class="control-label">Select User:</label>
+					<select class="select_arrow" onchange="visible(this.value)" id="userId" style="width: 20%;padding: 12px;border: 1px solid #ccc;border-radius: 4px;resize: vertical;"  required="required"  >
+				  		<option value="0" >Please Choose...</option>
+                        <option th:each="doc: ${users}" th:value="${doc.userId}" th:text="${doc.firstName}"></option>
+
+                    </select>
+     
+            </div>
+                              <br/> <br/>
+    
+
+    		                  
+             <table id="userTable" name="userrights" class="css-serial" >
+             
+      
+       <!-- Header Table -->
+       
+       <thead>
+            <tr>
+                <th>SNo</th>
+				<th>L1</th>
+			 <!--	<th>View</th>
+				<th>Download</th>  -->
+                <th>L2</th>
+                <th>View</th>
+				<th>Download</th>
+                <th>L3</th>
+                <th>View</th>
+				<th>Download</th>
+                <th>L4</th>
+                <th>View</th>
+				<th>Download</th>
+               
+                
+            </tr>
+        </thead>
+        
+    
+        
+        
+        <!-- Footer Table -->
+       
+       <tbody>
+       	
+       	
+			<tr th:each = "folders,iter: ${Folderlevels}">
+			
+				<td>&nbsp;</td>
+		
+				<td><input type="checkbox" name="folder"  th:class=" 'f'+${folders.getmoduleId1()}" th:text= "${folders.getlev1()}"  th:value = "${folders.getmoduleId1()}" th:id="${iter.index} + '1'" onclick="checkMe(this.id)" disabled="disabled" />
+				</td>	
+			<!-- 	<td><label class="switch"><input type="checkbox" th:name="${folders.getmoduleId1()}" th:value="'v'+${folders.getmoduleId1()}" th:id ="'v'+${folders.getmoduleId1()}"  th:class="'v'+${folders.getmoduleId1()}"  disabled="disabled" /><span class="slider round"><span class="on">Yes</span><span class="off">No</span> </span></label>
+				</td>
+				<td><label class="switch"><input type="checkbox" th:name="${folders.getmoduleId1()}" th:value="'d'+${folders.getmoduleId1()}" th:id="'d'+${folders.getmoduleId1()}"  th:class="'d'+${folders.getmoduleId1()}" disabled="disabled"/><span class="slider round"><span class="on">Yes</span><span class="off">No</span> </span></label>
+				</td>  -->
+				<td><input type="checkbox" name="folder" th:class=" 'f'+${folders.getmoduleId2()}"  th:id="${iter.index} + '2' " th:text= "${folders.getlev2()}" th:value = "${folders.getmoduleId2()}" onclick="checkMe(this.id)" disabled="disabled" />
+				</td>
+				<td><label class="switch"><input type="checkbox" th:name="${folders.getmoduleId2()}" th:value="'v'+${folders.getmoduleId2()}"  th:id ="'v'+${folders.getmoduleId2()}" th:class="'v'+${folders.getmoduleId2()}"  disabled="disabled" /><span class="slider round"><span class="on">Yes</span><span class="off">No</span> </span></label>
+				</td>
+				<td><label class="switch"><input type="checkbox" th:name="${folders.getmoduleId2()}" th:value="'d'+${folders.getmoduleId2()}" th:id ="'d'+${folders.getmoduleId2()}" th:class="'d'+${folders.getmoduleId2()}"  disabled="disabled"/><span class="slider round"><span class="on">Yes</span><span class="off">No</span> </span></label>
+				</td>
+				<td><input type="checkbox" name="folder" th:class=" 'f'+${folders.getmoduleId3()}"  th:id="${iter.index}+'3'" th:text= "${folders.getlev3()}" th:value = "${folders.getmoduleId3()}"   onclick="checkMe(this.id)" disabled="disabled"/>
+				</td>	
+				<td><label class="switch"><input type="checkbox" th:name="${folders.getmoduleId3()}" th:value=" 'v'+${folders.getmoduleId3()}" th:id ="'v'+${folders.getmoduleId3()}" th:class="'v'+${folders.getmoduleId3()}"  disabled="disabled"/><span class="slider round"><span class="on">Yes</span><span class="off">No</span> </span></label>
+				</td>
+				<td><label class="switch"><input type="checkbox" th:name="${folders.getmoduleId3()}" th:value="'d'+${folders.getmoduleId3()}" th:id ="'d'+${folders.getmoduleId3()}" th:class="'d'+${folders.getmoduleId3()}"  disabled="disabled"/><span class="slider round"><span class="on">Yes</span><span class="off">No</span> </span></label>
+				</td>		
+				<td><input type="checkbox" name="folder" th:class=" 'f'+${folders.getmoduleId4()}"  th:id="${iter.index}+'4'" th:text= "${folders.getlev4()}"  th:value = "${folders.getmoduleId4()}"  onclick="checkMe(this.id)" disabled="disabled" />
+				</td> 
+				<td><label class="switch"><input type="checkbox" th:name="${folders.getmoduleId4()}" th:value="'v'+${folders.getmoduleId4()}" th:id ="'v'+${folders.getmoduleId4()}" th:class="'v'+${folders.getmoduleId4()}"  disabled="disabled"/><span class="slider round"><span class="on">Yes</span><span class="off">No</span> </span></label>
+				</td> 
+				<td><label class="switch"><input type="checkbox" th:name="${folders.getmoduleId4()} " th:value="'d'+${folders.getmoduleId4()}" th:id ="'d'+${folders.getmoduleId4()}" th:class="'d'+${folders.getmoduleId4()}"  disabled="disabled"/><span class="slider round"><span class="on">Yes</span><span class="off">No</span> </span></label>
+				</td>
+
+
+			</tr>
+			
+		</tbody>
+		
+    </table>
+    
+    <br/> <br/>
+   <button class="common_btn" value="New" id="authorization" onclick="provideRightsToUser()" >
+				<img src="/images/add_user_icon.png" class="icon_mr"
+					alt="Add Folder" title="Add Folder" />Folder Authorization
+			</button>
+    
+
+
+    
+</div>
+
+	<!--FOOTER START-->
+	<div class="footer">Copyright 2019 Future Group. All rights
+		reserved.</div>
+	<!--FOOTER END-->
+
+	
+</body>
+</html>

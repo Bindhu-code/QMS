@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="shortcut icon" href="images/favicon.png"
+	type="image/fav.icon" />
+<link
+	href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i"
+	rel="stylesheet" />
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<title>Quality Management System</title>
+
+<!-- Bootstrap -->
+<link href="css/bootstrap.min.css" rel="stylesheet" />
+<link href="css/style.css" rel="stylesheet" />
+<link rel="stylesheet" href="css/font-awesome.min.css" />
+<!--  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>  -->
+<script src="/js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+<script type="text/javascript">
+	function clearFunction() {
+		var username = document.getElementById("username");
+		username.value = '';
+		var password = document.getElementById("password");
+		password.value = '';
+		var error = document.getElementById("error");
+		error.value = '';
+	}
+
+	function forgotpassword() {
+		window.location.href = "/forgotpassword"
+	}
+	
+	$(document).ready(function() {
+		console.log("here");
+		 /* $.ajax({
+	        url: "/showData",
+	        type: "GET",
+	        dataType: "text", 
+	         success: function(data) {
+	            console.log(data);
+	        } */
+		/*  var flag= true;
+		 if(flag){
+	    		window.location.href="/showData";
+	    		break;
+	    		//flag=false;
+	    } */
+		
+//	});
+		 
+	});
+</script>
+</head>
+<body onload="noBack();" onpageshow="if (event.persisted) noBack();"
+	class="login_backbg">
+	
+	<h1 th:text="${hiddenFlag}" style="color:white"></h1>
+	<form action="#" th:action="@{/login}" method="post"
+		th:object="${user}">
+		<!--LOGIN START-->
+		<div class="loginPagecontainer">
+			<img src="images/home_logo.png" alt="Italian Trulli" />
+		</div>
+
+		<div id="login-wrapper">
+			<div class="login-block">
+				<div class="logo">
+					<img src="images/logo.png" size="20"
+						alt="Quality Management System" title="Quality Management System" />
+				</div>
+				<div th:each="errorMessageVO : ${errorMsg}" id="error">
+					<span class="error" th:text="${errorMessageVO.errorMessage}"
+						th:if="${errorMessageVO.errorMessage != null}">Exception</span>
+				</div>
+				<!-- <div class="error" th:if="${session.USER_PASSWORD_INVALID != null}" id="error">
+					 <span th:text="${session.USER_PASSWORD_INVALID.errorMessageVO.errorMessage}">Exception</span> 
+				</div> -->
+				<div class="error" th:if="${session.USER_PASSWORD_INVALID != null}"
+					id="error">
+					<span
+						th:text="${session.USER_PASSWORD_INVALID.errorMessageVO.errorMessage}">Exception</span>
+				</div>
+				<!--INPUT START-->
+				<div class="login-form-group">
+					<input type="text" id="username" required="required"
+						th:field="*{userName}" placeholder="Username" /> <label
+						class="control-label"></label><i class="bar"></i>
+				</div>
+				<div class="login-form-group">
+					<input type="password" id="password" required="required"
+						th:field="*{password}" placeholder="Password" /> <label
+						class="control-label"></label><i class="bar"></i>
+				</div>
+				<div class="forgot_password">
+					<a onclick="forgotpassword()">Forgot Password</a>
+				</div>
+				<div class="clear_password">
+					<a onclick="clearFunction()">Clear</a>
+				</div>
+
+				<button class="button-blue-login-desktop">Login</button>
+				
+				<!--INPUT END-->
+			</div>
+	
+		</div>
+		<h1 th:text="${Content}"></h1>
+		
+		<div id="login-wrapper1">
+			<marquee>
+				<span class="marqueeClass">What's New</span>
+			</marquee>
+			<span class="newInformation" th:text="${Content}">
+		
+			</span>
+		</div>
+	</form>
+
+	<!--LOGIN END-->
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<!-- 
+	<script
+		src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	 -->	
+		<script src="/js/jquery.min.js"></script>
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script src="js/bootstrap.min.js"></script>
+</body>
+</html>

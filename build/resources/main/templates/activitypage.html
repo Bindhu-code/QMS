@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="shortcut icon" href="/images/favicon.png"
+	type="image/fav.icon" />
+<link
+	href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i"
+	rel="stylesheet" />
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<title>Quality Management System</title>
+
+<!-- Bootstrap -->
+<link href="/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/css/style.css" rel="stylesheet" />
+<link href="/css/bootstrap.css" rel="stylesheet" />
+<link rel="stylesheet" href="/css/font-awesome.min.css" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" 
+integrity="sha256-p6xU9YulB7E2Ic62/PX+h59ayb3PBJ0WFTEQxq0EjHw=" crossorigin="anonymous" />
+
+<style>
+.pagination-centered {
+	text-align: right;
+}
+
+.disabled {
+	pointer-events: none;
+	opacity: 0.5;
+}
+
+.updateContentMessage{
+	font-family: 'Roboto Condensed', sans-serif !important;
+	font-size:20px;
+	color: green;
+	padding-left: 500px;
+	margin-left: 100px
+}
+
+.required-field::after {
+    content: "*";
+    color: red;
+}
+
+.bag-fields {
+  display: flex;
+ /*    flex-wrap : wrap; */  
+   width : 100%;
+   margin-left: 5%;
+   margin-right: 25%;
+}
+
+.bag-field {
+  width: 40%;
+  min-height: 60px;
+  box-sizing: border-box;
+  background-clip:content-box;
+}
+
+.pointer-disabled {
+	pointer-events: none;
+}
+.common_btn1 {
+	width:auto;
+    background-color:#3cb371;
+    border:none;	
+    border-radius:6px;
+    color:white;
+	font-weight:500;
+    font-size:14px;
+    outline: none;
+    cursor: pointer;
+    padding:8px 12px 8px 12px;
+	-webkit-transition: all 0.5s ease;
+  	transition: all 0.5s ease;
+  	-webkit-appearance: none;
+	/*box-shadow: -1px 5px 8px -3px rgba(0,0,0,0.8);
+	-webkit-box-shadow: -1px 5px 8px -3px rgba(0,0,0,0.8);
+	-moz-box-shadow: -1px 5px 8px -3px rgba(0,0,0,0.8);*/
+}
+.updateContentMessage{
+	font-family: 'Roboto Condensed', sans-serif !important;
+	font-size:20px;
+	color: green;
+	padding-left: 300px;
+	margin-left: 20px 
+}
+
+#downloadDoc {
+	margin-right: 10px;
+}
+
+</style>
+<script src="/js/common.js"></script>
+<!--  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>  -->
+ <script src="/js/jquery-1.11.0.min.js"></script>
+
+<script src="/js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script> -->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
+ <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script> -->
+<script type="text/javascript">
+/*<![CDATA[*/
+
+
+function redirectHome() {
+    alert("new change");
+	//window.location.href = "./../redirecthome"
+    window.location.href = "/redirecthome"
+}
+
+function logout() {
+	window.location.href = "/logout"
+}
+
+
+function userManagmentAction() {
+	window.location.href = "/searchuser"
+}
+$(document).ready(function () {
+	
+	var date = new Date();
+	date.setDate(date.getDate());
+	console.log(date);
+	$("#startdate").datepicker({
+		changeMonth: true,
+		changeYear: true,
+		dateFormat: 'yy-mm-dd',
+		maxDate: date,
+		
+		onSelect: function(startdate) {
+		var selectedStartDate = startdate;
+		console.log(selectedStartDate);
+		$("#enddate").datepicker("change", {
+			changeMonth: true,
+			changeYear: true,
+			dateFormat: 'yy-mm-dd',
+			minDate: selectedStartDate,
+			maxDate: date
+		});
+		}
+
+		})/* .attr('readonly', 'readonly').css("background-color", "white"); */
+		
+	$("#enddate").datepicker({
+		changeMonth: true,
+		changeYear: true,
+		maxDate: date,
+		dateFormat: 'yy-mm-dd',
+		onSelect: function(enddate) {
+		var selectedEndDate = enddate;
+		console.log(selectedEndDate);
+		$("#startdate").datepicker("change", {
+		changeMonth: true,
+		changeYear: true,
+		dateFormat: 'yy-mm-dd',
+		maxDate: selectedEndDate
+		});
+		}
+		})/* .attr('readonly', 'readonly').css("background-color", "white"); */
+		
+		
+		$.ajax({
+			 type: "post",
+			 url: "/getUserDataForReport",
+			  cache: false,    
+			  dataType : 'json',
+			  success: function(response){
+				  data = response;
+					console.log(response);
+					for(var i=0;i<response.length;i++){
+						 var option = "<option value = " + response[i].userId + ">" +response[i].username  +  "</option>"; 
+						 $("#usenameValues").append(option);
+					}
+					
+				  }	
+		});
+		
+
+	$.ajax({
+		 type: "post",
+		 url: "/getRolenames",
+		  cache: false,    
+		  dataType : 'json',
+		  success: function(response){
+			  data = response;
+				console.log(response);
+				for(var i=0;i<response.length;i++){
+					 var option = "<option value = " + response[i].rolename + ">" +response[i].rolename  +  "</option>"; 
+					 $("#usertypeValues").append(option);
+				}
+				
+			  }	
+	});	
+}); 
+
+
+
+	
+/*]]>*/
+	
+</script>
+
+</head>
+<body>
+	<!--HEADER START-->
+	<div class="header">
+
+		<div class="header_inner">
+
+			<div class="inner_logo">
+				<img src="/images/inner_logo.png" alt="Quality Management System"
+					onclick="redirectHome()" title="Quality Management System" />
+			</div>
+
+			<div class="header_right">
+				<span STYLE="color: white; font-size: 10pt"> User:</span> <span
+					STYLE="color: white; font-size: 10pt"
+					th:text="${session.SESSION_USER_VO.firstName + ' ' +session.SESSION_USER_VO.lastName}"
+					th:if="${session.SESSION_USER_VO != null}"> </span> <input
+					type="text" th:if="${filerec}" class="header_search" name="search"
+					id="search" />
+
+				<button
+					th:if="${session.SESSION_USER_VO != null and session.SESSION_USER_VO.role.roleId == 1}"
+					class="common_btn width100" onclick="userManagmentAction()">
+					<img src="/images/group_user_icon.png" class="icon_mr"
+						alt="User management" title="User management" />User management
+				</button>
+				<span class="header_logout">
+					
+					<button class="common_btn width100" onclick="logout()">
+						<img src="/images/logout_icon.png" class="icon_mr" alt="logout"
+							title="logout" />Logout
+					</button>
+
+				</span>
+			</div>
+		</div>
+	</div>
+
+	<!--HEADER END-->
+	<div class="watermark">
+		<img src="/images/watermark_4.png" />
+	</div>
+	<div class="container">
+	<form  action ="#" >
+	<div class = "bag-fields">
+		<div class="bag-field">
+					<div class="col-25 ">
+						<label class ="required-field" for="startdate">StartDate:</label>
+					<!--  </div>
+					<div class="col-75">  -->
+						<input type="text" class="datepicker" autocomplete="off" id="startdate"  style="width:30%" placeholder="Select Start date..."  required="required"  />		
+					</div>		
+			</div>
+			<div class="bag-field">
+					<div class="col-25 ">
+						<label class ="required-field" for="enddate">EndDate:</label>
+					<!--  </div>
+					<div class="col-75">  -->
+						<input type="text" class="datepicker" autocomplete="off" id="enddate"  style="width:30%" placeholder="Select End date..."  required="required"  />		
+					</div>		
+			</div>
+				<div class="bag-field">
+				<div class="col-25">
+					<label for="usename">Username:</label>
+
+				<select class="select_arrow"  id="usernameValues"  style="width:40%">
+					 <option value="0" >Please Select...</option>
+					 </select>
+				</div>
+			</div>
+				<div class="bag-field">
+				<div class="col-25">
+					<label for="rolename">UserType:</label>
+
+				<select class="select_arrow"  id="usertypeValues"  style="width:40%">
+					 <option value="0" >Please Select...</option>
+					 </select>
+				</div>
+			</div>
+			
+	<div class="bag-field">
+				<div class="col-25">
+					<label class ="required-field"  for="action">Action:</label>
+
+				<select class="select_arrow"  id="actionValues"  style="width:40%">
+					 <option value="0" >Please Select...</option>
+					  <option value="1" >All</option>
+					 <option value="2" >Downloaded</option>
+					 <option value="3" >Viewed</option>
+					  <option value="4" >Uploaded</option>
+					
+					 </select>
+				</div>
+			</div>	
+	</div>
+	
+	<div class="row" id="allButtonField" >
+				<div class="col-25"></div>
+				<div class="col-75" style="margin-top: 15px;margin-left: -60px">
+					<button class="common_btn1"  type="submit" name="action" value="report">GenerateReport</button>
+					<button class="common_btn"  style=" background-color:#3cb371; color:white;" type="button" id="backBtn" value="Back" onclick="redirectHome()" >Back</button>
+					<button class="common_btn" style=" background-color:#3cb371; color:white;" type="button" name="action" value="report" onclick="refresh(this.value)">Refresh</button>
+				</div>
+				 <br/> <br/>
+			</div>
+			
+		
+	</form>
+	</div>
+	
+	
+	
+
+	<!--FOOTER START-->
+	<div class="footer">Copyright 2019 Future Group. All rights
+		reserved.</div>
+	<!--FOOTER END-->
+
+	
+</body>
+</html>

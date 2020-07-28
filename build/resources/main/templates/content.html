@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="shortcut icon" href="/images/favicon.png"
+	type="image/fav.icon" />
+<link
+	href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i"
+	rel="stylesheet" />
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<title>Quality Management System</title>
+
+<!-- Bootstrap -->
+<link href="/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/css/style.css" rel="stylesheet" />
+<link href="/css/bootstrap.css" rel="stylesheet" />
+<link rel="stylesheet" href="/css/font-awesome.min.css" />
+
+<style>
+.pagination-centered {
+	text-align: right;
+}
+
+.disabled {
+	pointer-events: none;
+	opacity: 0.5;
+}
+
+.pointer-disabled {
+	pointer-events: none;
+}
+
+.updateContentMessage{
+	font-family: 'Roboto Condensed', sans-serif !important;
+	font-size:20px;
+	color: green;
+	padding-left: 500px;
+	margin-left: 100px
+}
+
+#downloadDoc {
+	margin-right: 10px;
+}
+</style>
+<script src="/js/common.js"></script>
+
+<!-- <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>  -->
+<script src="/js/jquery-1.11.0.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>  -->
+<script src="/js/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+	function redirectHome() {
+		window.location.href = "/redirecthome"
+	}
+
+	function userManagmentAction() {
+		window.location.href = "/searchuser"
+	}
+	function backScreen() {
+		window.location.href = "/backscreen"
+	}
+	function backToPreviousScreen(parentId) {
+		if (parentId == "#") {
+			window.location.href = "/redirecthome";
+		} else {
+			window.location.href = "/getFolderDetails/" + parentId;
+		}
+	}
+	function logout() {
+		window.location.href = "/logout"
+	}
+
+	
+</script>
+
+</head>
+<body>
+	<!--HEADER START-->
+	<div class="header">
+
+		<div class="header_inner">
+
+			<div class="inner_logo">
+				<img src="/images/inner_logo.png" alt="Quality Management System"
+					onclick="redirectHome()" title="Quality Management System" />
+			</div>
+
+			<div class="header_right">
+				<span STYLE="color: white; font-size: 10pt"> User:</span> <span
+					STYLE="color: white; font-size: 10pt"
+					th:text="${session.SESSION_USER_VO.firstName + ' ' +session.SESSION_USER_VO.lastName}"
+					th:if="${session.SESSION_USER_VO != null}"> </span> <input
+					type="text" th:if="${filerec}" class="header_search" name="search"
+					id="search" />
+
+				<button
+					th:if="${session.SESSION_USER_VO != null and session.SESSION_USER_VO.role.roleId == 1}"
+					class="common_btn width100" onclick="userManagmentAction()">
+					<img src="/images/group_user_icon.png" class="icon_mr"
+						alt="User management" title="User management" />User management
+				</button>
+				<span class="header_logout">
+					
+					<button class="common_btn width100" onclick="logout()">
+						<img src="/images/logout_icon.png" class="icon_mr" alt="logout"
+							title="logout" />Logout
+					</button>
+
+				</span>
+			</div>
+		</div>
+	</div>
+
+	<!--HEADER END-->
+	<div class="watermark">
+		<img src="/images/watermark_4.png" />
+	</div>
+	<!--CONTAINER START-->
+	<h2 class ="updateContentMessage " th:text="${message}"></h2>
+	<div class="container">
+		<form id="content" class="contentform" action="#" th:action="@{/saveContent}" th:object="${createContent}" method="post" >
+		
+		<div class="row">
+				<div class="col-25">
+					<label for="docnumber">Enter Welcome Message Here:</label>
+				</div>
+				<div class="col-75">
+						<textarea rows="10" cols="50"  placeholder="Please enter here...." th:field="*{content}" required="required"></textarea>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-25"></div>
+				<div class="col-75">
+					<!-- input type="submit" name="action" value="save"/-->
+					<button class="common_btn" type="submit" name="action" value="save">Save</button>
+					<button class="common_btn" type="button" id="backBtn" value="Back" onclick="redirectHome()">Back</button>
+				</div>
+			</div>
+		</form>
+	</div>	
+
+	<!--FOOTER START-->
+	<div class="footer">Copyright 2019 Future Group. All rights
+		reserved.</div>
+	<!--FOOTER END-->
+
+	
+</body>
+</html>

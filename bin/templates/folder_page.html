@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="shortcut icon" href="images/favicon.png"
+	type="image/fav.icon" />
+<link
+	href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i"
+	rel="stylesheet" />
+<title>Quality Management System</title>
+<link href="css/bootstrap.min.css" rel="stylesheet" />
+<link href="/css/style.css" rel="stylesheet" />
+<link rel="stylesheet" href="/css/font-awesome.min.css" />
+<link rel="stylesheet" href="/css/layout.css" />
+
+<!-- <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>  -->
+<script src="/js/jquery-1.11.0.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<style type="text/css">
+.box{
+  max-width:100%;
+  height:auto;
+}
+
+.watermark{
+	 position: fixed; 
+	/* z-index: 0;
+	opacity: 0.2;
+	display: block; */
+	/* margin-top: 0px;
+    margin-left: -11px; */
+    top:70px;
+    left:0;
+     max-height:auto;
+     width:auto; 
+}
+
+.modal1 {
+display: none; 
+position: fixed; 
+z-index: 1; 
+padding-top:14%; 
+left: 0;
+top: 0;
+width: 100%; 
+height: 100%;
+overflow: auto;
+background-color: rgb(0,0,0); 
+background-color: rgba(0,0,0,0.4); 
+}
+.modal-content {
+background-color: #fefefe;
+margin: auto;
+padding: 20px;
+border: 1px solid #888;
+width:500px;
+}
+.close1 {
+color: #aaaaaa;
+float: left;
+font-size: 28px;
+font-weight: bold;
+}
+
+
+.close_cancel_membership {
+padding-left:400px;
+
+
+}
+.add-secondary-member-popup{ width:100%; clear:both; /*float:left;*/}
+.add-secondary-member-popup{ text-align:center;}
+
+.add-title{font-size:18px; color:red; line-height:26px;}
+.add-secondary-member-popup-btn-wrapper {width: 100%; height: auto; clear: both; text-align: center; margin: 10px 0px 10px 0px;}
+
+.select_arrow_header {width:60%; background: #ffffff url(../images/down-arrow.png) no-repeat right center !important;}
+.header_left{ width:20%; float:left; margin-top:18px;margin-left: 10%;}   
+
+ 
+</style>
+<script type="text/javascript">
+
+
+	function openDocument(moduleId,userId,roleId) {
+		
+		 if(roleId==3 || roleId==2){
+			 var requestData ={};
+			    var data;
+			    requestData["moduleId"]=moduleId;
+			    requestData["userId"]=userId;
+			    $.ajax({
+		 			  type: "post",
+		 			  url: "/verifyCredentials",
+		 			  cache: false,    
+		 			  data:requestData,
+		 			  dataType : 'json',
+		 			  success: function(response){
+		 				 if(response==true)
+		 				  	window.location.href = "/getFolderDetails/" + moduleId;
+		 				 else
+		 					
+		 					 var modal = document.getElementById('authorizeModal');
+		 					 modal.style.display = 'block';
+		 					 
+		 					 
+		 		      },
+		 			  error: function(){      
+		 			   alert('Error while processing.');
+		 			  }});
+		 }
+		 else{ 
+				window.location.href = "/getFolderDetails/" + moduleId;
+		 } 
+	}
+	
+	function closePop() {
+		var modal = document.getElementById('authorizeModal');
+		var span = document.getElementsByClassName("close")[0];
+		modal.style.display = "none";
+	}
+	function closeButton() {
+		var modal = document.getElementById('authorizeModal');
+		var span = document.getElementsByClassName("close")[0];
+		modal.style.display = "none";
+	}
+
+	function Reports(value){
+	
+		window.location.href = "/reports/" + value;	
+	}
+	
+	
+	function userManagmentAction() {
+		window.location.href = "/searchuser"
+	}
+
+	function compliance() {
+		window.location.href = "/quality"
+	} 
+
+	function addcontent(){
+		window.location.href="/addContent";
+	}
+	function addnewfolder(){
+		
+		window.location.href="/addnewFolder";
+		
+	}
+
+	function logout() {
+		window.location.href = "/logout";
+	}
+
+	function back(){
+		window.location.href = "/redirecthome";
+	}
+	
+	
+	var glValDet;
+	var glFolDet;
+
+	function createFolder() {
+		// Get the modal
+		var modal = document.getElementById('myModal');
+		modal.style.display = "block";
+		var element = document.getElementById("valuedet");
+		glValDet = element;
+		element.parentNode.removeChild(element);
+		document.getElementById("folderdet").style.visibility = "visible";
+	}
+
+	function closeClass() {
+		var modal = document.getElementById('myModal');
+		var span = document.getElementsByClassName("close")[0];
+		modal.style.display = "none";
+	}
+
+	function checkFunction(cb) {
+		if (!cb.checked) {
+			var element = document.getElementById("details");
+			element.parentNode.append(glValDet);
+			//document.getElementById("valuedet").style.visibility = "visible";
+			var element1 = document.getElementById("folderdet");
+			glFolDet = element1;
+			element1.parentNode.removeChild(element1);
+			//document.getElementById("folderdet").style.visibility = "hidden";
+		} else {
+			var element = document.getElementById("valuedet");
+			glValDet = element;
+			element.parentNode.removeChild(element);
+			//document.getElementById("valuedet").style.visibility = "hidden";
+			var element1 = document.getElementById("details");
+			element1.parentNode.append(glFolDet);
+			//document.getElementById("folderdet").style.visibility = "visible";
+		}
+	}
+	
+	$(document).ready(function() {
+		$("#search").keypress(function(e) {
+			if (e.which == 13) {
+				var search = document.getElementById("search").value;
+				if (search === "") {
+					window.location.href = "/searchFolder/" + "ALL";
+					return false;
+				} else {
+					window.location.href = "/searchFolder/" + search;
+					return false;
+				}
+			}
+		});
+	});
+</script>
+
+</head>
+<body onload="noBack();" onpageshow="if (event.persisted) noBack();">
+	<!--HEADER START-->
+	<div class="header">
+		<div class="header_inner">
+			<div class="inner_logo">
+				<img src="/images/inner_logo.png" alt="Quality Management System"
+					title="Quality Management System" />
+			</div>
+			<div class="header_left" th:if="${session.SESSION_USER_VO.role.roleId == 1}">
+			<span STYLE="color: white; font-size: 10pt ; "> Reports:</span> 
+				<select class="select_arrow_header" required="required" onchange="Reports(this.value)" >
+				<option value="" >Please Choose...</option>
+                <option value="report" >Usage Reports</option>
+				</select>
+			</div>
+			<div class="header_right">
+				<span STYLE="color: white; font-size: 10pt"> User:</span> <span
+					STYLE="color: white; font-size: 10pt"
+					th:text="${session.SESSION_USER_VO.firstName + ' ' +session.SESSION_USER_VO.lastName}"
+					th:if="${session.SESSION_USER_VO != null}"></span> 
+				 <input type="text" name="search" placeholder="Search By folder.." id="search" />
+				<!-- <span th:switch="${session.SESSION_USER_VO.role.roleId}" th:if="${session.SESSION_USER_VO != null}" > -->
+				<button
+					th:if="${session.SESSION_USER_VO != null and session.SESSION_USER_VO.role.roleId == 1}"
+					class="common_btn width100" onclick="userManagmentAction()">
+					<img src="/images/group_user_icon.png" class="icon_mr"
+						alt="User management" title="User management" />User management
+				</button>
+				<!--           </span> -->
+				<span class="header_logout">
+					<button class="common_btn width100" onclick="logout()">
+						<img src="/images/logout_icon.png" class="icon_mr" alt="logout"
+							title="logout" />Logout
+					</button>
+				</span>
+				
+				
+				
+			</div>
+
+		</div>
+	</div>
+	<!--HEADER END-->
+	 <div class="watermark">
+		<img src="/images/watermark_4.png" />
+	</div>
+	<!--CONTAINER START-->
+	<div id="authorizeModal" class="modal1" style="display: none;">
+	 	<div class="modal-content">
+	 			<span class="close_cancel_membership" onclick="closePop()" ><img src="/images/close_icon.png" /></span>
+	 			
+	 			<div class="add-secondary-member-popup">
+	 					<span  class="add-title" id="authorizeMsg"> UNAUTHORIZED ACCESS</span>
+	 			</div>
+				<div class="add-secondary-member-popup-btn-wrapper">
+				<button class="common_btn"  style=" background-color:#3cb371; color:white;" type="button" id="okBtn" onclick="closeButton()" >OK</button>
+				
+				</div>
+				 
+				
+		</div>
+	</div>
+	
+	
+	<div class="container">
+		<span style="padding-left:90%" th:if="${session.SESSION_USER_VO.role.roleId == 1}">
+	  		<!-- a onclick="addcontent()">ADD NEW CONTENT</a-->
+	  		<button class="common_btn width100" onclick="addcontent()"> Add Content</button>
+	  	</span>
+	  	<!-- <span style="padding-left:90%"  th:if="${session.SESSION_USER_VO.roleId == 1}">
+	  		<button class="common_btn width100" onclick="addnewfolder()"> Add NewFolder</button>
+	  	</span> -->
+	  		
+		<div class="locationdir" th:text="${dirloc}" hidden="true"></div>  
+		<button value="New" id="myBtn" onclick="createFolder()" hidden="true">Create
+			Folder</button>
+		<!-- Added by Ajay for prepare pop-up model -->
+		<!-- The Modal -->
+		<div id="myModal" class="modal">
+
+			<!-- Modal content -->
+			<div class="modal-content">
+				<form id="modelform" th:action="@{/createfolder}" method="post"
+					th:object="${folderDetail}">
+					<span hidden="true" class="flashMessage">${message}</span> <span class="close"
+						onclick="closeClass()">&times;</span>
+						
+					<div class="row">
+						<div class="col-25"></div>
+						<div class="col-75">
+							<input type="checkbox" name="rootchk" id="rootchk"
+								checked="checked" onchange="checkFunction(this);" />Root
+						</div>
+					</div>
+					<div id="details"></div>
+					<div class="row" id="valuedet">
+						<div class="col-25">Hierarchy - 1</div>
+						<div class="col-75">
+							<input type="text" th:field="*{hierarchy1}" />
+						</div>
+					</div>
+					<div class="row" id="folderdet">
+						<div class="col-25">Name</div>
+						<div class="col-75">
+							<input type="text" th:field="*{rootName}" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-25"></div>
+						<div class="col-75">
+							<input type="submit" value="Create" />
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<!--  Ended by pop-up model -->
+		<!--CONTENT START-->
+		
+		
+		<div  th:if="${flag==true}" class=""  id="goback">
+				<img src="/images/back_arrow_icon.png" alt="Back" title="Back" onclick="back()" />
+			</div>
+		
+		
+		<div class="row">
+			<!--BOX START-->
+			<div class="col-md-3 "
+				th:each="module: ${parentList}">
+				<div th:text="${module.moduleId}" hidden="true"></div>
+				<div class="category_box2"
+					th:onclick="|openDocument('${module.moduleId}','${session.SESSION_USER_VO.userId}','${session.SESSION_USER_VO.role.roleId}')|">
+					<img src="/images/folder_icon.png" alt="were" />
+					<h1 th:text="${module.moduleName}"></h1>
+					<!-- <a th:text="${module.moduleName}" th:href="@{'/getFolderDetails/' + ${module.moduleId}}"></a> -->
+				</div>
+			</div>
+			<!--BOX END-->
+		</div>
+		<!--CONTENT END-->
+	</div>
+	<!--CONTAINER END-->
+	<!--FOOTER START-->
+	<div class="footer">Copyright 2019 Future Group. All rights
+		reserved.</div>
+	<!--FOOTER END-->
+</body>
+</html>
